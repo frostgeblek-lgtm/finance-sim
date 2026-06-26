@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Capitalist</title> 
+        <style>
+        :root {
+            --bg-color: #121824; 
+            --card-bg: #1F2937;  
+            --text-color: #f8fafc;
+            --green: #10b981;    
+            --red: #ef4444;
+            --accent: #3b82f6;
+            --orange: #f59e0b;   
+            --purple: #a855f7;
+            --teal: #14b8a6;
+            --dark-gray: #374151;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color); color: var(--text-color);
+            margin: 0; padding: 20px; line-height: 1.4; user-select: none;
+        }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(135deg, var(--card-bg), #0f172a);
+            padding: 20px 25px; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4); margin-bottom: 20px; border: 1px solid var(--dark-gray);
+        }
+
+        .btn-next-day {
+            background: linear-gradient(135deg, var(--orange), #d97706);
+            color: white; border: none; padding: 14px 28px; border-radius: 8px;
+            cursor: pointer; font-weight: bold; font-size: 16px;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3); transition: all 0.2s;
+        }
+        .btn-next-day:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5); }
+
+        .stats-container {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px; margin-bottom: 20px;
+        }
+        .stat-card {
+            background: var(--card-bg); padding: 15px; border-radius: 10px;
+            text-align: center; border: 1px solid var(--dark-gray); border-left: 4px solid var(--accent);
+        }
+        .stat-card.money { border-left-color: var(--green); }
+        .stat-card.debt { border-left-color: var(--red); }
+        .stat-card.career { border-left-color: var(--purple); }
+        .stat-card.network { border-left-color: var(--teal); }
+        .stat-card h3 { margin: 0 0 5px 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card p { margin: 0; font-size: 19px; font-weight: bold; font-family: 'Courier New', monospace; }
+
+        .matrix-container {
+            background: var(--card-bg); padding: 15px; border-radius: 12px;
+            border: 1px solid var(--dark-gray); margin-bottom: 20px;
+        }
+        .matrix-title-area {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+        }
+        .matrix-bar-stack {
+            display: flex; height: 18px; border-radius: 6px; overflow: hidden; background: #111827; margin-bottom: 12px;
+        }
+        .matrix-segment { height: 100%; transition: width 0.3s ease; }
+        .matrix-legend { display: flex; flex-wrap: wrap; gap: 15px; font-size: 12px; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+        .switch-container {
+            display: flex; align-items: center; gap: 10px; background: #111827; padding: 8px 15px; border-radius: 8px; border: 1px solid var(--dark-gray);
+        }
+        .switch-btn {
+            position: relative; width: 44px; height: 22px; background: #4b5563; border-radius: 11px; cursor: pointer; transition: background 0.2s;
+        }
+        .switch-btn::after {
+            content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: left 0.2s;
+        }
+        .switch-btn.active { background: var(--green); }
+        .switch-btn.active::after { left: 24px; }
+
+        .main-layout { display: grid; grid-template-columns: 2.7fr 1fr; gap: 20px; }
+        @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr; } }
+
+        .panel { background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--dark-gray); }
+        .panel h2 { margin-top: 0; border-bottom: 2px solid var(--dark-gray); padding-bottom: 10px; font-size: 18px; color: var(--orange); }
+
+        .tabs { display: flex; gap: 6px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn {
+            background: #111827; color: white; border: 1px solid var(--dark-gray);
+            padding: 10px 14px; border-radius: 6px; cursor: pointer; white-space: nowrap; font-size: 13px; transition: background 0.2s;
+        }
+        .tab-btn:hover { background: #374151; }
+        .tab-btn.active { background: var(--accent); border-color: var(--accent); font-weight: bold; }
+
+        .search-container { display: flex; gap: 10px; margin-bottom: 15px; }
+        .search-input {
+            flex: 1; background: #111827; color: white; border: 1px solid var(--dark-gray);
+            padding: 10px 15px; border-radius: 6px; font-size: 14px;
+        }
+
+        .table-wrapper { max-height: 500px; overflow-y: auto; border: 1px solid var(--dark-gray); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid var(--dark-gray); font-size: 13px; }
+        th { color: #94a3b8; background-color: #111827; position: sticky; top: 0; z-index: 10; }
+
+        .clickable-asset { cursor: pointer; color: var(--accent); font-weight: bold; }
+        .clickable-asset:hover { color: var(--orange); text-decoration: underline; }
+
+        .input-qty { width: 70px; background: #111827; color: white; border: 1px solid #475569; padding: 4px; border-radius: 4px; text-align: center; }
+        .btn { color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .btn:disabled { background-color: #334155 !important; color: #64748b !important; cursor: not-allowed; }
+        .btn-buy { background-color: var(--green); }
+        .btn-sell { background-color: var(--red); }
+        .btn-action { background-color: var(--accent); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .up { color: var(--green); font-weight: bold; }
+        .down { color: var(--red); font-weight: bold; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 8000; }
+        .modal-content { background: #121824; width: 90%; max-width: 700px; height: 75vh; border-radius: 16px; border: 2px solid var(--orange); display: flex; flex-direction: column; overflow: hidden; }
+        .modal-header { background: #1f2937; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--orange); }
+        .log-box { flex: 1; padding: 20px; overflow-y: auto; font-family: 'Courier New', monospace; background-color: #0b0f19; }
+        .log-entry { margin-bottom: 6px; padding: 6px; border-radius: 4px; background: #1f2937; font-size: 12px; border-left: 3px solid var(--accent); }
+
+        #chart-modal-content { max-width: 600px; height: auto; padding-bottom: 20px; }
+        .chart-container-box { padding: 20px; background: #0b0f19; display: flex; flex-direction: column; align-items: center; }
+        .big-chart-canvas { background: #070a12; border: 1px solid var(--dark-gray); border-radius: 8px; width: 100%; max-width: 540px; height: 240px; }
+
+        .hidden { display: none !important; }
+        .card-item { background: #111827; padding: 15px; border-radius: 8px; border: 1px solid var(--dark-gray); margin-bottom: 12px; }
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 12px 20px; border-radius: 8px; color: white; font-weight: bold; font-size: 13px; }
+
+        #quick-log-container { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+        .mini-feed { padding: 6px 10px; border-radius: 4px; background: #111827; font-size: 11.5px; border-left: 3px solid #475569; }
+
+        @keyframes pop-in {
+            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes blink-alert {
+            0% { background-color: #7f1d1d; opacity: 1; }
+            50% { background-color: #991b1b; opacity: 0.7; }
+            100% { background-color: #7f1d1d; opacity: 1; }
+        }
+
+        #tutorial-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent; 
+            z-index: 999999 !important; 
+            display: flex; flex-direction: column; 
+            justify-content: flex-start; 
+            align-items: center; 
+            padding-top: 30px; 
+            pointer-events: none;
+        }
+        .tutorial-box {
+            background: #1f2937; border: 3px solid var(--orange); border-radius: 12px;
+            padding: 20px; width: 90%; max-width: 450px; text-align: center; 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.95); color: white; 
+            animation: pop-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+            z-index: 9999999 !important; 
+            pointer-events: auto;
+        }
+        .tutorial-highlight {
+            position: relative; 
+            z-index: 99998 !important; 
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85), 0 0 25px rgba(245, 158, 11, 1) !important;
+            background-color: var(--card-bg) !important; pointer-events: auto !important;
+        }
+        .tutorial-btn-next { background: var(--green); color: white; border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 12px; }
+        body.tutorial-locked { overflow: hidden !important; touch-action: none; }
+        
+        .company-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 15px; }
+        .company-stat-box { background: #111827; padding: 12px; border-radius: 6px; border: 1px solid var(--dark-gray); text-align: center; }
+        .company-stat-box h4 { margin: 0 0 5px 0; font-size: 11px; color: #cbd5e1; text-transform: uppercase; }
+        .company-stat-box p { margin: 0; font-size: 16px; font-weight: bold; font-family: 'Courier New', monospace; }
+        .strike-alert { animation: blink-alert 1.5s infinite; color: white; padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; margin-top: 12px; border: 1px solid var(--red); }
+    </style>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <div id="tutorial-overlay" class="hidden">
+        <div class="tutorial-box">
+            <h3 style="margin-top:0; color:var(--orange);" id="tutorial-title">Panduan</h3>
+            <p id="tutorial-text" style="font-size:14px; line-height:1.5;"></p>
+            <button class="tutorial-btn-next" id="tutorial-btn" onclick="nextTutorialStep()">Lanjut &raquo;</button>
+        </div>
+    </div>
+
+    <header id="tour-header">
+        <div>
+            <h1 style="margin:0; font-size: 26px; color: var(--orange);">The Capitalist</h1>
+            <small style="color: #94a3b8;">Advance Finance & Investment Simulation</small>
+        </div>
+        <div>
+            <button class="btn-next-day" id="tour-nextday-btn" onclick="nextDay()">HARI BERIKUTNYA⏩</button>
+        </div>
+    </header>
+
+    <div class="matrix-container">
+        <div class="matrix-title-area">
+            <h3>🧠 The Smart Wealth Matrix & Asset Allocation</h3>
+            <div class="switch-container">
+                <span style="font-size: 11.5px; color: #cbd5e1;">Auto-Compounding Pipeline</span>
+                <div id="compounding-switch" class="switch-btn" onclick="toggleAutoCompounding()"></div>
+            </div>
+        </div>
+        <div class="matrix-bar-stack">
+            <div id="bar-cash" class="matrix-segment" style="background: #10b981; width: 100%;"></div>
+            <div id="bar-stocks" class="matrix-segment" style="background: #3b82f6; width: 0%;"></div>
+            <div id="bar-properties" class="matrix-segment" style="background: #eab308; width: 0%;"></div>
+            <div id="bar-bonds" class="matrix-segment" style="background: #14b8a6; width: 0%;"></div>
+        </div>
+        <div class="matrix-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div> Kas: <span id="lbl-matrix-cash">$0</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div> Saham: <span id="lbl-matrix-stocks">$0</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#eab308;"></div> Real Estate: <span id="lbl-matrix-properties">$0</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#14b8a6;"></div> Obligasi: <span id="lbl-matrix-bonds">$0</span></div>
+            <div class="legend-item" style="margin-left: auto; color: var(--orange); font-weight: bold;">Net Worth: <span id="lbl-matrix-total">$0</span></div>
+        </div>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-card money">
+            <h3>Uang</h3>
+            <p id="txt-cash">$10,000.00</p>
+        </div>
+        <div class="stat-card debt">
+            <h3>Utang Bank</h3>
+            <p id="txt-debt">$0.00</p>
+        </div>
+        <div class="stat-card">
+            <h3>Kalender</h3>
+            <p id="txt-date">1 Januari 1990</p>
+        </div>
+        <div class="stat-card career" id="tour-card-career">
+            <h3>Jabatan</h3>
+            <p id="txt-job">Unemployed</p>
+        </div>
+        <div class="stat-card network">
+            <h3>Relasi & Analisis</h3>
+            <p id="txt-network">🤝 0 | 🧠 0 Pts</p>
+        </div>
+        <div class="stat-card" style="border-left-color: var(--orange);">
+            <h3>Siklus & Inflasi Makro</h3>
+            <p id="txt-macro-cycle">Recovery (2.0%)</p>
+        </div>
+        <div class="stat-card" style="border-left-color: var(--purple);">
+            <h3>Suku Bunga Acuan</h3>
+            <p id="txt-macro-rate">6.00%</p>
+        </div>
+        <div class="stat-card" style="border-left-color: var(--teal);">
+            <h3>Sentimen & Likuiditas</h3>
+            <p id="txt-macro-sentiment">M2: $1.00M | 💸 50</p>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <div>
+            <div class="tabs" id="tour-tabs-row">
+                <button class="tab-btn active" id="tab-btn-market" onclick="switchTab(event, 'tab-market')">📊Saham</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-blackmarket')">🕵️ Pasar Gelap</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-mycorporate')">🏭 Perusahaan Saya</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-property')">🏢 Real Estate</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-corporate')">🏭 Korporasi</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-network')">🤝 Relasi</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-bank')">💰Bank</button>
+                <button class="tab-btn" id="tab-btn-career" onclick="switchTab(event, 'tab-career')">✉️Lowongan Kerja</button>
+                <button class="tab-btn" onclick="switchTab(event, 'tab-spy')">🧠 Riset & Sabotase</button>
+            </div>
+
+            <div id="tab-market" class="panel">
+                <h2>Perdagangan Global</h2>
+                <div class="search-container">
+                    <input type="text" id="market-search" class="search-input" placeholder="🔍 Cari kode emiten atau nama perusahaan..." oninput="updateUI()">
+                </div>
+                <div class="table-wrapper" id="tour-market-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aset / Kode (Klik Untuk Grafik)</th>
+                                <th>Sektor</th>
+                                <th>Harga Pasar</th>
+                                <th>P/E Rasio</th>
+                                <th>Kepemilikan</th>
+                                <th>Kuantitas</th>
+                                <th>Aksi Operasional</th>
+                            </tr>
+                        </thead>
+                        <tbody id="market-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-blackmarket" class="panel hidden">
+                <h2>🕵️ Aliran Komoditas Pasar Gelap (Shadow Market)</h2>
+                <p style="font-size:12px; color:#94a3b8;">Komoditas ilegal bergerak berlawanan dengan pasar reguler. Hati-hati dengan resiko razia harian!</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Komoditas</th>
+                                <th>Harga Kontraband</th>
+                                <th>Risiko Razia</th>
+                                <th>Kepemilikan</th>
+                                <th>Eksekusi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="blackmarket-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-mycorporate" class="panel hidden">
+                <h2>Ayo bangun Perusahaan pribadi mu</h2>
+                <p style="font-size:13px; color:#cbd5e1; margin-bottom:15px;">Ayo Bangun kerajaan bisnis manufaktur Anda sendiri. Sistem ini memiliki beragam mekanisme meliputi pengadaan bahan baku, manajemen tenaga kerja, evolusi R&D, serta pendanaan surat utang (Obligasi).</p>
+                
+                <div id="company-setup-view">
+                    <div style="background:#111827; padding:20px; border-radius:10px; border:2px dashed var(--orange); text-align:center;">
+                        <h3>Mendirikan PT (Perseroan Terbatas) Baru</h3>
+                        <p style="color:#94a3b8; font-size:13px;">Dibutuhkan kapital modal yang besar serta kekuatan Relasi untuk mendapatkan izin dari birokrasi perizinan dagang internasional.</p>
+                        <div style="margin: 15px 0; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+                            <input type="text" id="mycorp-input-name" class="search-input" style="max-width:250px;" placeholder="Nama Perusahaan Anda">
+                            <select id="mycorp-select-type" class="search-input" style="max-width:180px;">
+                                <option value="Konsumer">Sektor Konsumer</option>
+                                <option value="Teknologi">Sektor Teknologi</option>
+                                <option value="Energi">Sektor Energi</option>
+                            </select>
+                        </div>
+                        <p style="font-weight:bold; color:var(--orange);">Biaya Pendirian: $1,000,000.00</p>
+                        <button class="btn btn-buy" style="padding:10px 20px;" onclick="establishMyCompany()">Buat Perusahaan</button>
+                    </div>
+                </div>
+
+                <div id="company-dashboard-view" class="hidden">
+                    <div style="background:linear-gradient(135deg, #1f2937, #111827); padding:15px; border-radius:8px; border:1px solid var(--orange); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                        <div>
+                            <h3 id="mycorp-lbl-name" style="margin:0; color:var(--orange); font-size:20px;">PT. Syarikat Jaya</h3>
+                            <small id="mycorp-lbl-type" style="color:#94a3b8;">Sektor: Konsumer</small>
+                            <div style="margin-top:5px; font-size:13px; font-weight:bold; color:var(--green);" id="mycorp-lbl-product">Produk Aktif: Makanan Kaleng (Tier 1)</div>
+                        </div>
+                        <div style="margin-left:auto; text-align:right;">
+                            <span style="font-size:12px; color:#cbd5e1;">Skala Operasional:</span>
+                            <div id="mycorp-lbl-level" style="font-size:18px; font-weight:bold; color:var(--teal);">Level 1</div>
+                        </div>
+                    </div>
+
+                    <div id="mycorp-strike-alert" class="strike-alert hidden">
+                        ⚠️ PERINGATAN: BURUH MOGOK KERJA MASSAL! Efisiensi Produksi 0%. Segera naikkan kebijakan upah!
+                    </div>
+
+                    <div class="company-grid">
+                        <div class="company-stat-box">
+                            <h4>Karyawan (Buruh)</h4>
+                            <p id="mycorp-stat-employees">0 Orang</p>
+                        </div>
+                        <div class="company-stat-box">
+                            <h4>Efisiensi Produksi</h4>
+                            <p id="mycorp-stat-efficiency">50.0%</p>
+                        </div>
+                        <div class="company-stat-box">
+                            <h4>Bahan Baku (Gudang)</h4>
+                            <p id="mycorp-stat-raw">0 Unit</p>
+                        </div>
+                        <div class="company-stat-box">
+                            <h4>Produk Jadi (Goods)</h4>
+                            <p id="mycorp-stat-goods">0 Unit</p>
+                        </div>
+                        <div class="company-stat-box" style="border-color:var(--accent);">
+                            <h4>Distributor Resmi</h4>
+                            <p id="mycorp-stat-dist">1 Jalur</p>
+                        </div>
+                        <div class="company-stat-box" style="border-color:var(--red);">
+                            <h4>Distributor Pasar Gelap</h4>
+                            <p id="mycorp-stat-shadowdist">0 Jalur</p>
+                        </div>
+                    </div>
+
+                    <div class="grid-2" style="margin-top:15px;">
+                        <div style="background:#111827; padding:15px; border-radius:8px; border:1px solid var(--dark-gray);">
+                            <h3 style="margin-top:0; color:var(--green); font-size:14px;">🏭 Manajemen Rantai Pasok & Tenaga Kerja</h3>
+                            <div style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>Beli Bahan Baku Pasokan <span id="mycorp-lbl-rawcost">($40/Unit)</span>:</span>
+                                    <button class="btn btn-buy" onclick="buyCompanyMaterials()">Beli +50 Unit</button>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>Kebijakan Upah Pegawai:</span>
+                                    <select id="mycorp-select-wage" class="search-input" style="width:140px; padding:4px;" onchange="changeWagePolicy()">
+                                        <option value="Minimum">Minimum ($800/Bln)</option>
+                                        <option value="Standard">Standar ($1,500/Bln)</option>
+                                        <option value="Premium">Premium ($2,500/Bln)</option>
+                                    </select>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>Rekrut Karyawan Baru:</span>
+                                    <button class="btn btn-action" onclick="hireCompanyEmployee()">Rekrut Karyawan ($3,000)</button>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>Upgrade Efisiensi Mesin:</span>
+                                    <button class="btn btn-action" onclick="upgradeCompanyEfficiency()">Upgrade Efisiensi ($35,000 + 10 Pts)</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background:#111827; padding:15px; border-radius:8px; border:1px solid var(--dark-gray);">
+                            <h3 style="margin-top:0; color:var(--purple); font-size:14px;">📣 Promosi, Logistik & Pasar Gelap</h3>
+                            <div style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>Suntik Anggaran Iklan Pemasaran:</span>
+                                    <button class="btn btn-buy" onclick="boostCompanyMarketing()">Iklan Ekspres ($5,000)</button>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>Ekspansi Jalur Agen Resmi:</span>
+                                    <button class="btn btn-action" onclick="expandLegalDistributor()">Kontrak Agen ($20,000)</button>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:var(--orange);">Suap Penyelundup (Shadow Agent):</span>
+                                    <button class="btn btn-sell" onclick="hireBlackMarketDistributor()">Sewa Distributor ($45,000)</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2" style="margin-top:15px;">
+                        <div style="background:#111827; padding:15px; border-radius:8px; border:1px solid var(--dark-gray);">
+                            <h3 style="margin-top:0; color:var(--accent); font-size:14px;">🔬 R&D: Evolusi Lini Produk</h3>
+                            <p style="font-size:12px; color:#cbd5e1; margin-top:0;">Tingkatkan generasi komoditas PT Anda untuk melipatgandakan margin laba. Semakin canggih produk, semakin mendominasi pasar reguler.</p>
+                            <button class="btn btn-action" style="width:100%;" onclick="upgradeProductTier()">Evolusi Riset Produk (Cost Tergantung Tier)</button>
+                        </div>
+                        
+                        <div style="background:#111827; padding:15px; border-radius:8px; border:1px solid var(--dark-gray);">
+                            <h3 style="margin-top:0; color:var(--teal); font-size:14px;">🏦 Obligasi Korporat (Corporate Bonds)</h3>
+                            <p style="font-size:12px; color:#cbd5e1; margin-top:0;">Terbitkan surat utang PT (Tenor 60 Hari) untuk ekspansi instan. Beban bunga harian setara 8% bulanan.</p>
+                            <div style="display:flex; gap:10px;">
+                                <input type="number" id="mycorp-input-bond" class="input-qty" style="flex:1;" placeholder="Nominal Limit: Level x $100k">
+                                <button class="btn btn-buy" onclick="issueCorporateBond()">Terbitkan</button>
+                            </div>
+                            <div id="mycorp-bond-list" style="margin-top:10px; font-size:11px; color:var(--orange); max-height:60px; overflow-y:auto;">Tidak ada obligasi PT aktif.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-property" class="panel hidden">
+                <h2>Portofolio Real Estate Progresif</h2>
+                <div id="property-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;"></div>
+            </div>
+
+            <div id="tab-corporate" class="panel hidden">
+                <h2>Merger & Akuisisi Holding Korporasi</h2>
+                <div id="corporate-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;"></div>
+            </div>
+
+            <div id="tab-network" class="panel hidden">
+                <h2>Hub Lobi Sirkel Orang Penting</h2>
+                <div id="network-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;"></div>
+            </div>
+
+            <div id="tab-bank" class="panel hidden">
+                <h2>Manajemen Finansial Makro Bank</h2>
+                <div class="grid-2">
+                    <div style="background: #111827; padding:15px; border-radius:8px; border: 1px solid var(--dark-gray);">
+                        <h3>Kredit Plafon Ekspres</h3>
+                        <p>Limit Maksimal: <span class="up" id="txt-credit-limit">$5,000</span></p>
+                        <input type="number" id="input-borrow" class="input-qty" style="width:120px;" placeholder="Nominal">
+                        <button class="btn btn-sell" onclick="borrowMoney()">Ambil Pinjaman</button>
+                        <hr style="border-color:var(--dark-gray); margin:15px 0;">
+                        <input type="number" id="input-repay" class="input-qty" style="width:120px;" placeholder="Nominal">
+                        <button class="btn btn-buy" onclick="repayDebt()">Bayar Utang</button>
+                    </div>
+                    <div style="background: #111827; padding:15px; border-radius:8px; border: 1px solid var(--dark-gray);">
+                        <h3>Obligasi Terstruktur Bank</h3>
+                        <input type="number" id="input-bond" class="input-qty" style="width:120px;" placeholder="Nominal">
+                        <button class="btn btn-action" onclick="buyBond()">Beli Obligasi (30 Hari, Bunga 5%)</button>
+                        <h4 style="margin-top:15px;">Portofolio Obligasi:</h4>
+                        <div id="bonds-list" style="font-size:12px; color:var(--orange)">Tidak ada obligasi aktif.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-career" class="panel hidden">
+                <h2>Bursa Karir Komprehensif</h2>
+                <div id="career-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;"></div>
+            </div>
+
+            <div id="tab-spy" class="panel hidden">
+                <h2>Pusat Riset & Sabotase Korporat</h2>
+                <div class="grid-2">
+                    <div style="background: #111827; padding:15px; border-radius:8px; border: 1px solid var(--dark-gray);">
+                        <h3>Quest Analisis Riset</h3>
+                        <button class="btn btn-action" onclick="generateQuest()">Buka Riset Prospektus Baru</button>
+                        <div id="quest-container" style="margin-top:15px;"></div>
+                    </div>
+                    <div style="background: #111827; padding:15px; border-radius:8px; border: 1px solid var(--dark-gray);">
+                        <h3>⚡ Sabotase Pasar (Short Attack)</h3>
+                        <p style="font-size:12px; color:#cbd5e1;">Gunakan 30 Poin Analisis untuk menghancurkan harga emiten tertentu sebesar 20% lewat manipulasi berita.</p>
+                        <select id="spy-target-select" class="search-input" style="margin-bottom:10px;"></select>
+                        <button class="btn btn-sell" style="width:100%;" onclick="executeSabotage()">Luncurkan Serangan Informasi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <button class="btn" style="background: var(--orange); width: 100%; padding: 15px; font-size: 14px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; color:#020617;" onclick="toggleLogModal(true)">
+                📜 LOG HISTORIS
+            </button>
+            <div class="panel">
+                <h2>Global News</h2>
+                <div id="quick-log-container"></div>
+            </div>
+            <div class="panel" style="font-size:13px;">
+                <h2>Estimasi Neraca Bulanan</h2>
+                <p>Gaji Pokok: <span id="lbl-summary-salary" class="up">$0</span></p>
+                <p>Sewa Properti: <span id="lbl-summary-rent" class="up">$0</span></p>
+                <p>Dividen Korporasi: <span id="lbl-summary-div" class="up">$0</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="log-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>LOG INVESTASI JALUR PORTOFOLIO</h2>
+                <button class="btn btn-sell" onclick="toggleLogModal(false)">TUTUP</button>
+            </div>
+            <div class="log-box" id="log-target"></div>
+        </div>
+    </div>
+
+    <div id="chart-modal" class="modal-overlay hidden">
+        <div class="modal-content" id="chart-modal-content">
+            <div class="modal-header">
+                <h2 id="chart-modal-asset-title" style="margin:0; color:var(--green);">GRAFIK TREN HISTORIS</h2>
+                <button class="btn btn-sell" onclick="closeChartModal()">TUTUP</button>
+            </div>
+            <div class="chart-container-box">
+                <canvas id="big-trend-canvas" class="big-chart-canvas" width="540" height="240"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====== STATE ENGINE GAME ======
+        let game = {
+            cash: 10000.00, debt: 0.00, year: 1990, month: 1, day: 1,
+            jobName: "Unemployed", salary: 0, analysisScore: 0, networkScore: 0,
+            logs: [], bonds: [], autoCompounding: false, sanctionActive: false,
+
+            macroCycle: "Recovery",
+            interestRate: 0.06,      
+            inflation: 0.02,         
+            m2MoneySupply: 1000000,  
+            marketSentiment: 50,     
+            minskyStabilityDays: 0,  
+            leverageFactor: 1.0,
+
+            // STATE OBJEK OPERASIONAL PERUSAHAAN MANDIRI BARU & FITUR LANJUTAN
+            myCompany: {
+                established: false,
+                name: "",
+                type: "Konsumer",
+                level: 1,
+                employees: 0,
+                efficiency: 0.50,
+                marketing: 5,
+                rawMaterials: 0,
+                goods: 0,
+                distributors: 1,
+                blackMarketDistributors: 0,
+                // TEROBOSAN TERINTEGRASI:
+                wageTier: "Standard",
+                strikeActive: false,
+                productTier: 1,
+                issuedBonds: [],
+                vipMonopoly: false,
+                vipShadow: false
+            }
+        };
+
+        const productNames = {
+            "Konsumer": ["Makanan Kaleng", "Minuman Bersoda", "Kosmetik Massal"],
+            "Teknologi": ["Radio Tabung", "Pager 90an", "Komputer Komparator 386"],
+            "Energi": ["Briket Batu Bara", "Minyak Fraksi", "Bio-Fuel Sintetis"]
+        };
+
+        let tutorialStep = 0; 
+        let currentQuest = null;
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        const assets = [
+            { id: "AAPL", name: "Apple Computer Inc.", price: 1.20, type: "Teknologi", pe: 12.0, basePe: 12.0, volatility: 0.035, owned: 0, history: Array(30).fill(1.20) },
+            { id: "MSFT", name: "Microsoft Corporation", price: 0.80, type: "Teknologi", pe: 15.0, basePe: 15.0, volatility: 0.04, owned: 0, history: Array(30).fill(0.80) },
+            { id: "IBM", name: "IBM Blue Chip Giant", price: 22.00, type: "Teknologi", pe: 10.5, basePe: 10.5, volatility: 0.015, owned: 0, history: Array(30).fill(22.00) },
+            { id: "INTC", name: "Intel Semiconductors", price: 1.50, type: "Teknologi", pe: 11.2, basePe: 11.2, volatility: 0.03, owned: 0, history: Array(30).fill(1.50) },
+            { id: "HPQ", name: "Hewlett-Packard Co.", price: 3.50, type: "Teknologi", pe: 10.0, basePe: 10.0, volatility: 0.02, owned: 0, history: Array(30).fill(3.50) },
+            { id: "CSCO", name: "Cisco Systems Network", price: 0.10, type: "Teknologi", pe: 18.0, basePe: 18.0, volatility: 0.05, owned: 0, history: Array(30).fill(0.10) },
+            { id: "XOM", name: "Exxon Mobil Corp.", price: 11.50, type: "Energi", pe: 8.5, basePe: 8.5, volatility: 0.015, owned: 0, history: Array(30).fill(11.50) },
+            { id: "CVX", name: "Chevron Corporation", price: 13.20, type: "Energi", pe: 9.0, basePe: 9.0, volatility: 0.018, owned: 0, history: Array(30).fill(13.20) },
+            { id: "JPM", name: "JP Morgan Chase Bank", price: 4.50, type: "Finansial", pe: 9.5, basePe: 9.5, volatility: 0.018, owned: 0, history: Array(30).fill(4.50) },
+            { id: "GS", name: "Goldman Sachs Group", price: 18.00, type: "Finansial", pe: 11.0, basePe: 11.0, volatility: 0.025, owned: 0, history: Array(30).fill(18.00) },
+            { id: "KO", name: "Coca-Cola Corporation", price: 4.20, type: "Konsumer", pe: 16.5, basePe: 16.5, volatility: 0.012, owned: 0, history: Array(30).fill(4.20) },
+            { id: "WMT", name: "Walmart Discount Stores", price: 2.90, type: "Konsumer", pe: 17.0, basePe: 17.0, volatility: 0.015, owned: 0, history: Array(30).fill(2.90) },
+            { id: "GOLD", name: "Emas Komoditas Spot", price: 380.0, type: "Komoditas", pe: null, volatility: 0.008, owned: 0, history: Array(30).fill(380.0) },
+            { id: "OIL", name: "Minyak Mentah Brent", price: 20.0, type: "Komoditas", pe: null, volatility: 0.028, owned: 0, history: Array(30).fill(20.0) }
+        ];
+
+        const shadowAssets = [
+            { id: "SHDW_CHIP", name: "Sirkuit Mikro Selundupan Blok-E", price: 180.00, risk: 0.12, owned: 0 },
+            { id: "SHDW_DOC", name: "Cetak Biru Korporat Lapisan Rahasia", price: 1200.00, risk: 0.22, owned: 0 },
+            { id: "SHDW_URAN", name: "Uranium Batangan Akses Kilang", price: 5500.00, risk: 0.35, owned: 0 },
+            { id: "SHDW_ART", name: "Masterpiece Lukisan Klasik Curian", price: 15000.00, risk: 0.18, owned: 0 },
+            { id: "SHDW_WEAP", name: "Prototipe Senjata Balistik Militer", price: 22000.00, risk: 0.40, owned: 0 },
+            { id: "SHDW_DIAM", name: "Berlian Mentah Selundupan Afrika", price: 8500.00, risk: 0.15, owned: 0 },
+            { id: "SHDW_GOLD", name: "Emas Batangan Tanpa Seri Registrasi", price: 4200.00, risk: 0.08, owned: 0 },
+            { id: "SHDW_DECR", name: "Kunci Dekripsi Server Keuangan Swiss", price: 31000.00, risk: 0.45, owned: 0 },
+            { id: "SHDW_OIL", name: "Barel Minyak Selundupan Pasar Gelap", price: 1100.00, risk: 0.20, owned: 0 },
+            { id: "SHDW_SAT", name: "Modul Transponder Satelit Militer", price: 65000.00, risk: 0.50, owned: 0 }
+        ];
+
+        const properties = [
+            { id: "prop1", name: "Ruko Sub-Urban Kelontong", price: 20000, rent: 180, owned: 0 },
+            { id: "prop2", name: "Apartemen Pusat Kota Loft", price: 85000, rent: 750, owned: 0 },
+            { id: "prop3", name: "Gudang Logistik Dermaga Pelabuhan", price: 150000, rent: 1400, owned: 0 },
+            { id: "prop4", name: "Ruko Komersial Sektor Barat", price: 240000, rent: 2300, owned: 0 },
+            { id: "prop5", name: "Vila Mewah Lereng Pegunungan Aspen", price: 520000, rent: 5100, owned: 0 },
+            { id: "prop6", name: "Plaza Perbelanjaan Distrik Pusat", price: 1200000, rent: 13500, owned: 0 },
+            { id: "prop7", name: "Kompleks Kondominium High-Rise", price: 3400000, rent: 41000, owned: 0 },
+            { id: "prop8", name: "Resort Eksklusif Pulau Privat", price: 7500000, rent: 92000, owned: 0 },
+            { id: "prop9", name: "Lahan Agro-Industri Kelapa Sawit", price: 15000000, rent: 210000, owned: 0 },
+            { id: "prop10", name: "Menara Kantor Tunggal Wall Street", price: 45000000, rent: 680000, owned: 0 }
+        ];
+
+        const corporates = [
+            { id: "corp1", name: "Mega Logistic Cargo Holding", price: 180000, dividend: 2500, owned: false },
+            { id: "corp2", name: "Pacific Steel Industry", price: 450000, dividend: 7000, owned: false },
+            { id: "corp3", name: "Omni Consumer Cybernetics Group", price: 950000, dividend: 16000, owned: false },
+            { id: "corp4", name: "Apex Pharmaceutical Global", price: 2100000, dividend: 38000, owned: false },
+            { id: "corp5", name: "Universal Sat-Telecom Network", price: 4800000, dividend: 95000, owned: false },
+            { id: "corp6", name: "United Energy Power Grid Inc.", price: 11000000, dividend: 240000, owned: false },
+            { id: "corp7", name: "Standard Petrochemical Multinasional", price: 28000000, dividend: 650000, owned: false },
+            { id: "corp8", name: "Trans-Continental Railroad Corp", price: 62000000, dividend: 1500000, owned: false },
+            { id: "corp9", name: "Horizon Aero-Space Industries", price: 140000000, dividend: 3800000, owned: false },
+            { id: "corp10", name: "Dynasty Broadcasting Media Group", price: 350000000, dividend: 11000000, owned: false }
+        ];
+
+        const networkVIP = [
+            { id: "net1", name: "Makan Dinner Bersama Manajer Kredit", cost: 1500, rewards: "credit1", desc: "Membuka plafon pinjaman kredit bank hingga $25,000" },
+            { id: "net2", name: "Lobi Kebijakan Sanksi Sektor Teknologi", cost: 12000, rewards: "sanction", desc: "Sektor teknologi turun 15%, komoditas melesat naik 40%" },
+            { id: "net3", name: "Suap Internal Kepala Otoritas Pajak", cost: 8500, rewards: "tax_shield", desc: "Mendapatkan perlindungan audit pasar gelap selama 100 hari" },
+            { id: "net4", name: "Pertemuan Rahasia Anggota Senator Distrik", cost: 25000, rewards: "credit2", desc: "Plafon pinjaman naik ekstrim hingga batas $250,000" },
+            { id: "net5", name: "Akses Eksklusif Broker Utama Wall Street", cost: 45000, rewards: "fee_cut", desc: "Memangkas volatilitas emiten teknologi sebesar 1% stabil" },
+            { id: "net6", name: "Koneksi Agen Spionase Industri Pusat", cost: 90000, rewards: "spy_intel", desc: "Mendapatkan bonus +50 Poin Analisis secara instan" },
+            { id: "net7", name: "Sponsor Pendanaan Kampanye Gubernur", cost: 180000, rewards: "prop_tax", desc: "Menerima potongan biaya pembelian real estate sebesar 10%" },
+            { id: "net8", name: "Bisikan Kartel Minyak Internasional", cost: 400000, rewards: "oil_pump", desc: "Seketika mendongkrak harga komoditas OIL sebesar 30%" },
+            { id: "net9", name: "Simposium Tertutup Komite Sentral Bank", cost: 1200000, rewards: "interest_drop", desc: "Menurunkan bunga berjalan utang harian sebesar setengahnya" },
+            { id: "net10", name: "Akuisisi Syndikasi Kantor Berita Utama", cost: 5000000, rewards: "media_monopoly", desc: "Poin biaya meluncurkan Sabotase Pasar berkurang menjadi 10 Pts" },
+            // TAMBAHAN VIP TEROBOSAN
+            { id: "net11", name: "Lobi Panglima Fraksi Militer", cost: 150000, rewards: "corp_shadow", desc: "Distribusi Pasar Gelap PT Anda kebal 100% dari razia selamanya." },
+            { id: "net12", name: "Kartel Ekspor Impor Global", cost: 250000, rewards: "corp_monopoly", desc: "Harga beli bahan baku PT Anda dipangkas permanen dari $40 ke $18." }
+        ];
+
+        const jobs = [
+            { id: "1", name: "Magang Data Entry", salary: 800, reqAna: 0, reqNet: 0 },
+            { id: "2", name: "Analis Kredit Muda", salary: 2200, reqAna: 15, reqNet: 5 },
+            { id: "3", name: "Manajer Aset Portofolio", salary: 6500, reqAna: 50, reqNet: 20 },
+            { id: "4", name: "Kepala Auditor Keuangan Regional", salary: 14000, reqAna: 100, reqNet: 45 },
+            { id: "5", name: "Konsultan Strategi Makro Korporat", salary: 28000, reqAna: 180, reqNet: 90 },
+            { id: "6", name: "Direktur Pelaksana Investasi Bank", salary: 60000, reqAna: 300, reqNet: 160 },
+            { id: "7", name: "Wakil Presiden Direktur Capital Ventura", salary: 110000, reqAna: 450, reqNet: 250 },
+            { id: "8", name: "Chief Executive Officer (CEO) Holding", salary: 250000, reqAna: 700, reqNet: 400 },
+            { id: "9", name: "Penasihat Finansial Utama Kepresidenan", salary: 550000, reqAna: 1100, reqNet: 650 },
+            { id: "10", name: "Gubernur Bank Sentral Koordinator", salary: 1200000, reqAna: 1800, reqNet: 1100 }
+        ];
+
+        function showToast(msg, type = "success") {
+            let container = document.getElementById("toast-container");
+            let t = document.createElement("div"); t.className = "toast";
+            t.style.backgroundColor = type === "success" ? "var(--green)" : "var(--red)";
+            t.innerText = msg; container.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function toggleAutoCompounding() {
+            game.autoCompounding = !game.autoCompounding;
+            document.getElementById("compounding-switch").classList.toggle("active", game.autoCompounding);
+            showToast(game.autoCompounding ? "Auto-Compounding Aktif" : "Auto-Compounding Nonaktif");
+        }
+
+        let maxCreditLimit = 5000;
+        let taxShieldDays = 0;
+        let sabotageCost = 30;
+
+        function runMacroEconomicEngine() {
+            if (typeof assets === 'undefined' || assets.length === 0) return;
+
+            let targetRate = 0.06;
+            if (game.marketSentiment > 75) {
+                targetRate = 0.15; 
+                game.m2MoneySupply *= 0.985; 
+            } else if (game.marketSentiment < 30) {
+                targetRate = 0.02; 
+                game.m2MoneySupply *= 1.02;  
+            }
+            game.interestRate += (targetRate - game.interestRate) * 0.15;
+            game.inflation = 0.01 + (game.marketSentiment / 5000) + (game.m2MoneySupply / 50000000);
+
+            let upwardAssets = assets.filter(a => a.history && a.history.length >= 2 && a.price > a.history[a.history.length - 2]).length;
+            let isMarketRallying = upwardAssets >= (assets.length / 2);
+
+            if (isMarketRallying) {
+                game.minskyStabilityDays++;
+                game.marketSentiment += 1.2;
+                game.leverageFactor += 0.05; 
+            } else {
+                game.minskyStabilityDays = Math.max(0, game.minskyStabilityDays - 1);
+                game.marketSentiment -= 1.5;
+                game.leverageFactor = Math.max(1.0, game.leverageFactor - 0.08);
+            }
+            game.marketSentiment = Math.max(5, Math.min(100, game.marketSentiment));
+
+            let minskyMomentTriggered = false;
+            if (game.marketSentiment > 78) {
+                let crashProbability = (game.minskyStabilityDays / 180) * (game.leverageFactor / 2);
+                if (Math.random() < crashProbability) minskyMomentTriggered = true;
+            }
+
+            if (minskyMomentTriggered) {
+                game.marketSentiment = 8;
+                game.minskyStabilityDays = 0;
+                game.leverageFactor = 0.8;
+                game.macroCycle = "Depression";
+                addLog("🚨 MINSKY MOMENT", "GELEMBUNG BURSA PECAH PEKAT! Terjadi likuidasi utang paksa massal di pasar global.", "error");
+                showToast("CRASH TOTAL BURSA GLOBAL!", "error");
+            }
+
+            assets.forEach(a => {
+                let capitalAttraction = 1.0;
+                let originalVIPFactor = game.sanctionActive ? (a.type === "Teknologi" ? 0.98 : 1.02) : 1;
+
+                if (minskyMomentTriggered) {
+                    capitalAttraction = a.type === "Teknologi" ? 0.15 : 0.40;
+                    if (a.type === "Komoditas") capitalAttraction = 0.85; 
+                } else {
+                    if (a.type === "Teknologi") capitalAttraction -= (game.interestRate - 0.06) * 4.5;
+                    else if (a.type === "Finansial") capitalAttraction += (game.interestRate - 0.06) * 2.0;
+
+                    if (game.marketSentiment > 65) {
+                        capitalAttraction *= (game.marketSentiment / 50) * (a.type === "Teknologi" ? 1.8 : 1.1);
+                    } else if (game.marketSentiment < 40) {
+                        if (a.type === "Komoditas" || a.type === "Konsumer") {
+                            capitalAttraction += (50 - game.marketSentiment) * 0.03; 
+                        } else {
+                            capitalAttraction *= (game.marketSentiment / 50);
+                        }
+                    }
+
+                    if (a.type === "Teknologi" && Math.random() < 0.04) {
+                        let shock = Math.random() > 0.4 ? 1.4 : 0.6;
+                        capitalAttraction *= shock;
+                        if (shock > 1) {
+                            addLog("⚡ SCHUMPETER SHOCK", `Inovasi teknologi mendadak memicu migrasi likuiditas ke emiten ${a.id}`);
+                        }
+                    }
+                }
+
+                capitalAttraction = Math.max(0.05, capitalAttraction);
+                let baselineVolatility = a.type === "Teknologi" ? a.volatility * 1.5 : a.volatility;
+                let moneySupplyEffect = (game.m2MoneySupply / 1000000);
+
+                let randomFactor = (Math.random() - 0.5) * 2 * baselineVolatility * game.leverageFactor;
+                let priceChangePercentage = ((capitalAttraction - 1.0) * 0.04) + randomFactor + (moneySupplyEffect * 0.005 - 0.005);
+
+                a.price = Math.max(0.1, a.price * (1 + priceChangePercentage) * originalVIPFactor);
+
+                if (!a.history) a.history = [];
+                a.history.push(a.price);
+                if (a.history.length > 30) a.history.shift();
+            });
+
+            if (game.marketSentiment >= 70) game.macroCycle = "Boom 🚀";
+            else if (game.marketSentiment >= 45 && game.marketSentiment < 70) game.macroCycle = "Recovery 📈";
+            else if (game.marketSentiment >= 25 && game.marketSentiment < 45) game.macroCycle = "Recession 📉";
+            else game.macroCycle = "Depression 💀";
+        }
+
+        function nextDay() {
+            let maxDays = new Date(game.year, game.month, 0).getDate();
+            game.day++;
+
+            if (taxShieldDays > 0) taxShieldDays--;
+
+            if (game.day > maxDays) {
+                game.day = 1; game.month++;
+                if (game.month > 12) { game.month = 1; game.year++; }
+                
+                let rentIncome = properties.reduce((acc, p) => acc + (p.rent * p.owned), 0);
+                let divIncome = corporates.reduce((acc, c) => acc + (c.owned ? c.dividend : 0), 0);
+                let totalInflow = game.salary + rentIncome + divIncome;
+
+                if (game.myCompany && game.myCompany.established) {
+                    let wagePerEmp = game.myCompany.wageTier === "Premium" ? 2500 : (game.myCompany.wageTier === "Standard" ? 1500 : 800);
+                    let employeeWages = game.myCompany.employees * wagePerEmp;
+                    let overheadMaintenance = game.myCompany.level * 4000;
+                    
+                    let sirkelDiscount = Math.min(employeeWages * 0.3, game.networkScore * 25);
+                    let finalCorporateCost = Math.max(1000, (employeeWages + overheadMaintenance) - sirkelDiscount);
+                    
+                    game.cash -= finalCorporateCost;
+                    addLog("PERUSAHAAN", `Beban operasional & gaji buruh PT bulanan dipotong sebesar ${formatUSD(finalCorporateCost)}`, "error");
+                }
+
+                if(game.autoCompounding) {
+                    game.bonds.push({ amount: totalInflow, days: 30 });
+                    showToast(`Inflow $${totalInflow} dialihkan otomatis ke Obligasi Bank!`);
+                } else {
+                    game.cash += totalInflow;
+                }
+            }
+
+            runMacroEconomicEngine();
+
+            if (game.myCompany && game.myCompany.established) {
+                let comp = game.myCompany;
+                
+                // Strike Engine Logic Check (Harian)
+                if (comp.wageTier === "Minimum" && game.inflation > 0.04) {
+                    if (Math.random() < 0.03 && !comp.strikeActive) { 
+                        comp.strikeActive = true;
+                        addLog("HRD", "MOGOK KERJA MASSAL! Inflasi tinggi menekan daya beli buruh. Efisiensi PT lumpuh!", "error");
+                        showToast("BURUH PT MOGOK KERJA!", "error");
+                    }
+                }
+                
+                // Pembayaran Bunga Obligasi PT Harian
+                let totalDailyBondInterest = 0;
+                for(let i = comp.issuedBonds.length - 1; i >= 0; i--) {
+                    let b = comp.issuedBonds[i];
+                    let dailyInterest = (b.amount * 0.08) / 30; // Beban bunga 8% per bulan
+                    totalDailyBondInterest += dailyInterest;
+                    b.days--;
+                    if (b.days <= 0) {
+                        game.cash -= b.amount;
+                        addLog("KORPORASI", `Obligasi PT senilai ${formatUSD(b.amount)} jatuh tempo dan pokok dilunasi otomatis.`);
+                        comp.issuedBonds.splice(i, 1);
+                        showToast("Obligasi PT Jatuh Tempo & Dilunasi");
+                    }
+                }
+                game.cash -= totalDailyBondInterest;
+
+                // Fase Pemrosesan
+                if (comp.employees > 0 && comp.rawMaterials > 0) {
+                    let baseCapacity = comp.employees * 3 * comp.level;
+                    let actualProcessed = Math.min(baseCapacity, comp.rawMaterials);
+                    
+                    let effMod = 1.0;
+                    if (comp.strikeActive) effMod = 0.0;
+                    else if (comp.wageTier === "Premium") effMod = 1.3;
+                    else if (comp.wageTier === "Minimum") effMod = 0.7;
+
+                    let standardOutput = Math.floor(actualProcessed * comp.efficiency * effMod);
+                    
+                    comp.rawMaterials -= actualProcessed;
+                    comp.goods += standardOutput;
+                }
+
+                // Fase Distribusi Penjualan
+                if (comp.goods > 0) {
+                    let sirkelBonusDemand = 1 + (game.networkScore / 100); 
+                    let marketDemandVolume = Math.floor((comp.marketing * (game.marketSentiment / 40)) * sirkelBonusDemand);
+                    
+                    let legalSalesCap = comp.distributors * 8;
+                    let blackMarketSalesCap = comp.blackMarketDistributors * 24; 
+                    let maxDistributionCap = legalSalesCap + blackMarketSalesCap;
+                    
+                    let totalUnitsSold = Math.min(comp.goods, marketDemandVolume, maxDistributionCap);
+                    
+                    if (totalUnitsSold > 0) {
+                        let tierMultiplier = comp.productTier === 1 ? 1 : (comp.productTier === 2 ? 1.8 : 2.8);
+                        let baseRetailPrice = (comp.type === "Teknologi" ? 160 : (comp.type === "Energi" ? 220 : 95)) * tierMultiplier;
+                        let finalRetailPrice = baseRetailPrice * (1 + game.inflation);
+                        
+                        let bmUnitsSold = Math.min(totalUnitsSold, blackMarketSalesCap);
+                        let legalUnitsSold = totalUnitsSold - bmUnitsSold;
+                        
+                        let revenueLegal = legalUnitsSold * finalRetailPrice;
+                        let revenueBlack = bmUnitsSold * finalRetailPrice * 1.45;
+                        let totalCorporateRevenue = revenueLegal + revenueBlack;
+                        
+                        comp.goods -= totalUnitsSold;
+                        game.cash += totalCorporateRevenue;
+                        
+                        if(Math.random() < 0.15) {
+                            addLog("PERUSAHAAN", `PT berhasil menjual ${totalUnitsSold} unit produk generasi ${comp.productTier} dengan omzet ${formatUSD(totalCorporateRevenue)}`);
+                        }
+                    }
+                }
+
+                // Resiko Razia Pasar Gelap Perusahaan (Dibatalkan oleh VIP Shadow)
+                if (comp.blackMarketDistributors > 0 && taxShieldDays === 0 && !comp.vipShadow) {
+                    let detectionChance = comp.blackMarketDistributors * 0.025;
+                    if (Math.random() < detectionChance) {
+                        let finePenalty = 120000;
+                        game.cash -= finePenalty;
+                        comp.blackMarketDistributors = Math.max(0, comp.blackMarketDistributors - 1);
+                        addLog("OTORITAS", `Audit investigatif PT! Distribusi ilegal disita, denda korporasi ${formatUSD(finePenalty)}`, "error");
+                        showToast("Perusahaan terkena sanksi audit!", "error");
+                    }
+                }
+            }
+
+            if(Math.random() < 0.04 && taxShieldDays === 0) {
+                let lost = false;
+                shadowAssets.forEach(s => {
+                    if(s.owned > 0 && Math.random() < s.risk) { s.owned = 0; lost = true; }
+                });
+                if(lost) {
+                    addLog("OTORITAS", "Razia besar-besaran! Sebagian aset pasar gelap disita karena melanggar regulasi bursa.", "error");
+                    showToast("Terjadi razia pasar gelap!", "error");
+                }
+            }
+
+            game.bonds.forEach((b, i) => {
+                b.days--;
+                if(b.days <= 0) { game.cash += b.amount * 1.05; game.bonds.splice(i, 1); showToast("Obligasi Bank matang (+5% Bunga)!"); }
+            });
+
+            if (game.debt > 0) {
+                game.debt *= (1 + (game.interestRate / 365));
+            }
+
+            updateUI();
+            if(tutorialStep === 3) { nextTutorialStep(); }
+        }
+
+        // ====== FUNGSI PERUSAHAAN (UPDATED DENGAN TEROBOSAN) ======
+        function establishMyCompany() {
+            let nameInput = document.getElementById("mycorp-input-name").value.trim();
+            let selectedType = document.getElementById("mycorp-select-type").value;
+            let establishmentCost = 650000;
+
+            if(!nameInput) { showToast("Masukkan nama perusahaan terlebih dahulu!", "error"); return; }
+            if(game.cash < establishmentCost) { showToast("Kapital kas Anda tidak mencukupi!", "error"); return; }
+
+            game.cash -= establishmentCost;
+            game.myCompany.established = true;
+            game.myCompany.name = nameInput;
+            game.myCompany.type = selectedType;
+            game.myCompany.employees = 2; 
+            
+            addLog("KORPORASI", `Resmi mendirikan badan usaha berbadan hukum: PT. ${nameInput} di sektor ${selectedType}`);
+            showToast("PT Anda Berhasil Didirikan!");
+            document.getElementById("mycorp-select-wage").value = "Standard";
+            updateUI();
+        }
+
+        function buyCompanyMaterials() {
+            let comp = game.myCompany;
+            let pricePerUnit = comp.vipMonopoly ? 18 : 40;
+            let priceBatch = pricePerUnit * 50;
+            
+            if(game.cash < priceBatch) { showToast("Kas Anda kurang untuk pengadaan logistik!", "error"); return; }
+            game.cash -= priceBatch;
+            comp.rawMaterials += 50;
+            showToast(`Pasokan +50 Unit Bahan Baku Masuk (${formatUSD(priceBatch)})`);
+            updateUI();
+        }
+
+        function changeWagePolicy() {
+            let p = document.getElementById("mycorp-select-wage").value;
+            game.myCompany.wageTier = p;
+            if (p !== "Minimum" && game.myCompany.strikeActive) {
+                game.myCompany.strikeActive = false;
+                showToast("Pemogokan berakhir! Buruh kembali bekerja.");
+                addLog("HRD", "Kebijakan upah diperbaiki. Buruh menghentikan mogok kerja massal.");
+            }
+            updateUI();
+        }
+
+        function upgradeProductTier() {
+            let comp = game.myCompany;
+            if (comp.productTier >= 3) { showToast("Tier evolusi produk sudah maksimal!", "error"); return; }
+            
+            let cost = 50000 * comp.productTier;
+            let pts = 30 * comp.productTier;
+            
+            if(game.cash < cost || game.analysisScore < pts) { showToast(`Syarat Riset Generasi Baru: ${formatUSD(cost)} & ${pts} Pts Analisis!`, "error"); return; }
+            
+            game.cash -= cost;
+            game.analysisScore -= pts;
+            comp.productTier++;
+            
+            addLog("R&D", `Evolusi lini produk PT mencapai Generasi Tier ${comp.productTier}`);
+            showToast("Produk Generasi Baru Ditemukan!");
+            updateUI();
+        }
+
+        function issueCorporateBond() {
+            let comp = game.myCompany;
+            let val = Math.floor(document.getElementById("mycorp-input-bond").value);
+            let limit = comp.level * 100000;
+            let currentBonds = comp.issuedBonds.reduce((a, b) => a + b.amount, 0);
+
+            if (isNaN(val) || val <= 0) return;
+            if (currentBonds + val > limit) { showToast(`Limit maksimal obligasi PT adalah ${formatUSD(limit)}`, "error"); return; }
+
+            game.cash += val;
+            comp.issuedBonds.push({ amount: val, days: 60 });
+            addLog("KORPORASI", `PT menerbitkan obligasi sebesar ${formatUSD(val)} ke pasar publik.`);
+            showToast("Obligasi PT Berhasil Diterbitkan!");
+            updateUI();
+            document.getElementById("mycorp-input-bond").value = "";
+        }
+
+        function hireCompanyEmployee() {
+            let hireCost = 3000;
+            if(game.cash < hireCost) { showToast("Kas kurang untuk memproses kontrak rekrutmen!", "error"); return; }
+            game.cash -= hireCost;
+            game.myCompany.employees++;
+            showToast("Karyawan Baru Berhasil Dikontrak");
+            updateUI();
+        }
+
+        function upgradeCompanyEfficiency() {
+            let upMoney = 35000;
+            let upPoints = 10;
+            if(game.cash < upMoney || game.analysisScore < upPoints) { showToast("Syarat pendanaan keuangan atau poin analisis riset belum memadai!", "error"); return; }
+            
+            game.cash -= upMoney;
+            game.analysisScore -= upPoints;
+            game.myCompany.efficiency = Math.min(0.98, game.myCompany.efficiency + 0.08);
+            game.myCompany.level++;
+            
+            showToast("Teknologi Manufaktur PT Berhasil Diupgrade!");
+            updateUI();
+        }
+
+        function boostCompanyMarketing() {
+            let adCost = 5000;
+            if(game.cash < adCost) { showToast("Kas tidak mencukupi untuk membeli slot iklan media!", "error"); return; }
+            game.cash -= adCost;
+            game.myCompany.marketing += 15;
+            showToast("Kampanye Iklan Berhasil Diluncurkan");
+            updateUI();
+        }
+
+        function expandLegalDistributor() {
+            let distCost = 20000;
+            if(game.cash < distCost) { showToast("Kas kurang untuk negosiasi kontrak!", "error"); return; }
+            game.cash -= distCost;
+            game.myCompany.distributors++;
+            showToast("Membuka 1 Jalur Agen Distribusi Resmi");
+            updateUI();
+        }
+
+        function hireBlackMarketDistributor() {
+            let costBribe = 45000;
+            let minSirkel = 30;
+            if(game.cash < costBribe) { showToast("Kas kurang untuk membayar uang muka konsesi mafia pelabuhan!", "error"); return; }
+            if(game.networkScore < minSirkel) { showToast("Sirkel relasi VIP Anda terlalu lemah untuk menjangkau broker bayangan!", "error"); return; }
+            
+            game.cash -= costBribe;
+            game.myCompany.blackMarketDistributors++;
+            addLog("PASAR GELAP", "PT Anda menyewa jaringan distributor selundupan bawah tanah untuk memotong jalur pasokan.");
+            showToast("Distributor Pasar Gelap Aktif!");
+            updateUI();
+        }
+
+        // ====== SYSTEM BURSA & VIP ======
+        function tradeAsset(index, isBuy) {
+            let asset = assets[index];
+            let qty = Math.floor(parseFloat(document.getElementById(`qty-${asset.id}`).value));
+            if (isNaN(qty) || qty <= 0) return;
+
+            let total = asset.price * qty;
+            if (isBuy && game.cash >= total) {
+                game.cash -= total; asset.owned += qty;
+                addLog("BURSA", `Membeli ${qty} Unit ${asset.id}`);
+                if(tutorialStep === 1 && asset.id === "AAPL" && asset.owned >= 10) { nextTutorialStep(); }
+            } else if (!isBuy && asset.owned >= qty) {
+                game.cash += total; asset.owned -= qty;
+                addLog("BURSA", `Menjual ${qty} Unit ${asset.id}`);
+            } else { showToast("Gagal melakukan eksekusi!", "error"); }
+            updateUI();
+        }
+
+        function tradeShadow(index, isBuy) {
+            let s = shadowAssets[index];
+            if(isBuy && game.cash >= s.price) { 
+                game.cash -= s.price; s.owned++; 
+                addLog("SHADOW", `Membeli komoditas ilegal ${s.id}`);
+            }
+            else if(!isBuy && s.owned > 0) { 
+                game.cash += s.price * 1.45; s.owned--; 
+                addLog("SHADOW", `Penyelundupan komoditas ${s.id} berhasil dieksekusi.`); 
+            }
+            updateUI();
+        }
+
+        function buyProperty(index) {
+            let p = properties[index];
+            if(game.cash >= p.price) { game.cash -= p.price; p.owned++; addLog("ASET", `Membeli Properti ${p.name}`); updateUI(); }
+            else { showToast("Kas tidak mencukupi!", "error"); }
+        }
+
+        function buyCorporate(index) {
+            let c = corporates[index];
+            if(!c.owned && game.cash >= c.price) { game.cash -= c.price; c.owned = true; addLog("HOLDING", `Akuisisi penuh atas ${c.name}`); updateUI(); }
+            else { showToast("Gagal mengambil alih korporasi!", "error"); }
+        }
+
+        function executeVIP(index) {
+            let n = networkVIP[index];
+            if(game.cash >= n.cost) {
+                game.cash -= n.cost;
+                game.networkScore += 12;
+                addLog("LOBI", `Membangun aliansi dengan ${n.name}`);
+                
+                if(n.rewards === "credit1") maxCreditLimit = 25000;
+                if(n.rewards === "credit2") maxCreditLimit = 250000;
+                if(n.rewards === "sanction") game.sanctionActive = true;
+                if(n.rewards === "tax_shield") taxShieldDays = 100;
+                if(n.rewards === "spy_intel") game.analysisScore += 50;
+                if(n.rewards === "media_monopoly") sabotageCost = 10;
+                if(n.rewards === "oil_pump") { let oil = assets.find(a => a.id === "OIL"); if(oil) oil.price *= 1.3; }
+                
+                // VIP Terobosan Baru
+                if(n.rewards === "corp_shadow") game.myCompany.vipShadow = true;
+                if(n.rewards === "corp_monopoly") game.myCompany.vipMonopoly = true;
+
+                showToast(`Aliansi ${n.id} Terwujud!`);
+                updateUI();
+            } else { showToast("Kas tidak mencukupi untuk biaya konsesi lobi!", "error"); }
+        }
+
+        function borrowMoney() {
+            let val = Math.floor(document.getElementById("input-borrow").value);
+            if(val > 0 && game.debt + val <= maxCreditLimit) { game.cash += val; game.debt += val; updateUI(); }
+            else { showToast("Melebihi batas plafon kredit bank!", "error"); }
+        }
+        function repayDebt() {
+            let val = Math.floor(document.getElementById("input-repay").value);
+            if(val > 0 && game.cash >= val) { game.cash -= val; game.debt -= val; updateUI(); }
+        }
+        function buyBond() {
+            let val = Math.floor(document.getElementById("input-bond").value);
+            if(val > 0 && game.cash >= val) { game.cash -= val; game.bonds.push({ amount: val, days: 30 }); updateUI(); }
+        }
+
+        function applyJob(id) {
+            let j = jobs.find(job => job.id === id);
+            if(game.analysisScore >= j.reqAna && game.networkScore >= j.reqNet) {
+                game.jobName = j.name; game.salary = j.salary; updateUI();
+                if(tutorialStep === 5 && id === "1") { nextTutorialStep(); }
+            } else { showToast("Kualifikasi keahlian/sirkel belum memadai!", "error"); }
+        }
+
+        function generateQuest() {
+            currentQuest = { target: assets[Math.floor(Math.random() * assets.length)].id, reward: 20 };
+            document.getElementById("quest-container").innerHTML = `<div class='card-item'>Riset prospektus emiten <b>${currentQuest.target}</b>.<br><button class='btn btn-buy' style='margin-top:5px;' onclick='completeQuest()'>Kirim Hasil Analisis</button></div>`;
+        }
+        function completeQuest() {
+            if(currentQuest) { game.analysisScore += currentQuest.reward; currentQuest = null; document.getElementById("quest-container").innerHTML = ""; updateUI(); }
+        }
+        function executeSabotage() {
+            let target = document.getElementById("spy-target-select").value;
+            if(game.analysisScore >= sabotageCost) {
+                game.analysisScore -= sabotageCost;
+                let a = assets.find(asset => asset.id === target);
+                if(a) { a.price *= 0.8; addLog("SABOTASE", `Serangan informasi mendepresiasi saham ${target} sebesar -20%`); showToast(`Saham ${target} jatuh!`); updateUI(); }
+            } else { showToast("Poin analisis tidak mencukupi!", "error"); }
+        }
+
+        function switchTab(evt, id) {
+            ["tab-market", "tab-blackmarket", "tab-property", "tab-corporate", "tab-network", "tab-bank", "tab-career", "tab-spy", "tab-mycorporate"].forEach(t => document.getElementById(t).classList.add("hidden"));
+            document.getElementById(id).classList.remove("hidden");
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            if(evt) evt.currentTarget.classList.add("active");
+            if(tutorialStep === 4 && id === "tab-career") { nextTutorialStep(); }
+        }
+
+        function openChartModal(index) {
+            let asset = assets[index];
+            document.getElementById("chart-modal-asset-title").innerText = `GRAFIK TREN HISTORIS: ${asset.id}`;
+            document.getElementById("chart-modal").classList.remove("hidden");
+            renderChart(asset.history);
+        }
+        function closeChartModal() { document.getElementById("chart-modal").classList.add("hidden"); }
+        function renderChart(history) {
+            let canvas = document.getElementById("big-trend-canvas");
+            let ctx = canvas.getContext("2d"); ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = "#10b981"; ctx.lineWidth = 3; ctx.beginPath();
+            let max = Math.max(...history); let min = Math.min(...history);
+            let range = max - min === 0 ? 1 : max - min;
+            history.forEach((price, idx) => {
+                let x = (idx / (history.length - 1)) * (canvas.width - 40) + 20;
+                let y = canvas.height - ((price - min) / range * (canvas.height - 40) + 20);
+                if(idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+        }
+
+        function checkTutorialOnLoad() { if (localStorage.getItem("tutorial_done_1990") !== "true") { startTutorial(); } }
+        function startTutorial() { tutorialStep = 0; document.getElementById("tutorial-overlay").classList.remove("hidden"); document.body.classList.add("tutorial-locked"); nextTutorialStep(); }
+        function clearHighlights() { document.querySelectorAll(".tutorial-highlight").forEach(el => el.classList.remove("tutorial-highlight")); }
+
+        function nextTutorialStep() {
+            clearHighlights(); tutorialStep++;
+            let tTitle = document.getElementById("tutorial-title");
+            let tText = document.getElementById("tutorial-text");
+            let tBtn = document.getElementById("tutorial-btn");
+            tBtn.classList.remove("hidden");
+
+            if (tutorialStep === 1) {
+                tTitle.innerText = "🏦 Selamat Datang di The Capitalist!";
+                tText.innerText = "Pertama-tama mari kita Beli saham AAPL sebanyak minimal 10 Unit pada tabel bursa saham di bawah ini.";
+                tBtn.classList.add("hidden"); 
+                let targetRow = document.getElementById("qty-AAPL") ? document.getElementById("qty-AAPL").closest('tr') : null;
+                if(targetRow) { targetRow.classList.add("tutorial-highlight"); targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+            } 
+            else if (tutorialStep === 2) {
+                tTitle.innerText = "📈 Berhasil!"; tText.innerText = "Pembelian telah tercatat di portofolio asetmu."; tBtn.innerText = "Lanjut!";
+                document.getElementById("qty-AAPL").closest('tr').classList.add("tutorial-highlight");
+                document.getElementById("qty-AAPL").closest('tr').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            else if (tutorialStep === 3) {
+                tTitle.innerText = "⏳ Hari Berikutnya"; tText.innerText = "Silahkan klik tombol 'HARI BERIKUTNYA⏩' yang berada di kanan atas untuk memproses siklus harian."; tBtn.classList.add("hidden"); 
+                let nextBtn = document.getElementById("tour-nextday-btn"); nextBtn.classList.add("tutorial-highlight");
+                nextBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            else if (tutorialStep === 4) {
+                tTitle.innerText = "💼 Arus Kas Bulanan"; tText.innerText = "Selanjutnya Buka Tab '✉️Lowongan Kerja' untuk mendapatkan pendapatan tetap harian."; tBtn.classList.add("hidden");
+                let tabsRow = document.getElementById("tour-tabs-row"); tabsRow.classList.add("tutorial-highlight");
+                tabsRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            else if (tutorialStep === 5) {
+                tTitle.innerText = "📑 Lamar Jabatan"; 
+                tText.innerText = "Tekan tombol 'Lamar' pada posisi 'Magang Data Entry'."; 
+                tBtn.classList.add("hidden");
+                
+                let firstJobCard = document.getElementById("career-list").firstElementChild;
+                if (firstJobCard) {
+                    firstJobCard.classList.add("tutorial-highlight");
+                    firstJobCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+            else if (tutorialStep === 6) {
+                tTitle.innerText = "🚀 Kontrol Terbuka!"; tText.innerText = "Seluruh dasar-dasar permainan ini telah berhasil dilakukan sekarang alur permainan ini sepenuhnya berada pada kendali mu sekarang BERSEMANGATLAH!."; tBtn.innerText = "Mulai Bermain!";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            else {
+                document.getElementById("tutorial-overlay").classList.add("hidden"); document.body.classList.remove("tutorial-locked"); 
+                localStorage.setItem("tutorial_done_1990", "true"); clearHighlights(); updateUI();
+            }
+        }
+
+        function addLog(category, msg, type = 'default') { game.logs.unshift({ timestamp: `[${game.day}/${game.month}/${game.year}]`, category, msg, type }); }
+        function toggleLogModal(show) { document.getElementById("log-modal").classList.toggle("hidden", !show); if(show) { document.getElementById("log-target").innerHTML = game.logs.map(l => `<div class='log-entry'><b>${l.timestamp} [${l.category}]</b> ${l.msg}</div>`).join(''); } }
+
+        function updateUI() {
+            document.getElementById("txt-cash").innerText = formatUSD(game.cash);
+            document.getElementById("txt-debt").innerText = formatUSD(game.debt);
+            document.getElementById("txt-date").innerText = `${game.day} ${monthNames[game.month-1]} ${game.year}`;
+            document.getElementById("txt-job").innerText = game.jobName;
+            document.getElementById("txt-network").innerText = `🤝 ${game.networkScore} | 🧠 ${game.analysisScore} Pts`;
+            document.getElementById("txt-credit-limit").innerText = formatUSD(maxCreditLimit);
+
+            if(document.getElementById('txt-macro-cycle')) {
+                document.getElementById('txt-macro-cycle').innerText = `${game.macroCycle} (${(game.inflation * 100).toFixed(1)}%)`;
+            }
+            if(document.getElementById('txt-macro-rate')) {
+                document.getElementById('txt-macro-rate').innerText = (game.interestRate * 100).toFixed(2) + "%";
+            }
+            if(document.getElementById('txt-macro-sentiment')) {
+                document.getElementById('txt-macro-sentiment').innerText = `M2: ${(game.m2MoneySupply / 1000000).toFixed(2)}M | 🤝 ${Math.round(game.marketSentiment)}`;
+            }
+
+            let stocksValue = assets.reduce((acc, a) => acc + (a.price * a.owned), 0);
+            let propValue = properties.reduce((acc, p) => acc + (p.price * p.owned), 0);
+            let bondValue = game.bonds.reduce((acc, b) => acc + b.amount, 0);
+            let netWorth = game.cash + stocksValue + propValue + bondValue;
+
+            document.getElementById("lbl-matrix-cash").innerText = formatUSD(game.cash);
+            document.getElementById("lbl-matrix-stocks").innerText = formatUSD(stocksValue);
+            document.getElementById("lbl-matrix-properties").innerText = formatUSD(propValue);
+            document.getElementById("lbl-matrix-bonds").innerText = formatUSD(bondValue);
+            document.getElementById("lbl-matrix-total").innerText = formatUSD(netWorth);
+
+            let rentIncome = properties.reduce((acc, p) => acc + (p.rent * p.owned), 0);
+            let divIncome = corporates.reduce((acc, c) => acc + (c.owned ? c.dividend : 0), 0);
+            document.getElementById("lbl-summary-salary").innerText = formatUSD(game.salary);
+            document.getElementById("lbl-summary-rent").innerText = formatUSD(rentIncome);
+            document.getElementById("lbl-summary-div").innerText = formatUSD(divIncome);
+
+            if (game.myCompany && game.myCompany.established) {
+                document.getElementById("company-setup-view").classList.add("hidden");
+                document.getElementById("company-dashboard-view").classList.remove("hidden");
+                
+                let comp = game.myCompany;
+                document.getElementById("mycorp-lbl-name").innerText = "PT. " + comp.name;
+                document.getElementById("mycorp-lbl-type").innerText = "Sektor Dagang: " + comp.type;
+                document.getElementById("mycorp-lbl-level").innerText = "Level " + comp.level;
+                
+                let currentProductName = productNames[comp.type][comp.productTier - 1];
+                document.getElementById("mycorp-lbl-product").innerText = `Produk Aktif: ${currentProductName} (Tier ${comp.productTier})`;
+
+                if(comp.strikeActive) {
+                    document.getElementById("mycorp-strike-alert").classList.remove("hidden");
+                } else {
+                    document.getElementById("mycorp-strike-alert").classList.add("hidden");
+                }
+                
+                document.getElementById("mycorp-stat-employees").innerText = comp.employees + " Jiwa";
+                document.getElementById("mycorp-stat-efficiency").innerText = (comp.efficiency * 100).toFixed(1) + "%";
+                document.getElementById("mycorp-stat-raw").innerText = comp.rawMaterials + " Unit";
+                document.getElementById("mycorp-stat-goods").innerText = comp.goods + " Unit";
+                document.getElementById("mycorp-stat-dist").innerText = comp.distributors + " Koridor";
+                document.getElementById("mycorp-stat-shadowdist").innerText = comp.blackMarketDistributors + " Jalur Tikus";
+
+                document.getElementById("mycorp-lbl-rawcost").innerText = comp.vipMonopoly ? "($18/Unit VIP)" : "($40/Unit)";
+                
+                let bondHTML = comp.issuedBonds.length === 0 ? "Tidak ada obligasi PT aktif." : comp.issuedBonds.map(b => `<div>• $${b.amount} (Jatuh tempo: ${b.days} Hari)</div>`).join('');
+                document.getElementById("mycorp-bond-list").innerHTML = bondHTML;
+            } else {
+                document.getElementById("company-setup-view").classList.remove("hidden");
+                document.getElementById("company-dashboard-view").classList.add("hidden");
+            }
+
+            let searchVal = document.getElementById("market-search") ? document.getElementById("market-search").value.toLowerCase() : "";
+            let mHTML = '';
+            assets.forEach((a, i) => {
+                if(a.name.toLowerCase().includes(searchVal) || a.id.toLowerCase().includes(searchVal)) {
+                    mHTML += `<tr>
+                        <td><span class="clickable-asset" onclick="openChartModal(${i})">${a.id}</span><br><small>${a.name}</small></td>
+                        <td><small>${a.type}</small></td>
+                        <td><b class="up">${formatUSD(a.price)}</b></td>
+                        <td>${a.pe ? a.pe.toFixed(1) : '-'}</td>
+                        <td>${a.owned} Unit</td>
+                        <td><input type="number" id="qty-${a.id}" class="input-qty" value="1" min="1"></td>
+                        <td>
+                            <button class="btn btn-buy" onclick="tradeAsset(${i}, true)">Beli</button>
+                            <button class="btn btn-sell" onclick="tradeAsset(${i}, false)">Jual</button>
+                        </td>
+                    </tr>`;
+                }
+            });
+            document.getElementById("market-table-body").innerHTML = mHTML;
+
+            let bmHTML = '';
+            shadowAssets.forEach((s, i) => {
+                bmHTML += `<tr><td><b>${s.id}</b><br><small>${s.name}</small></td><td>${formatUSD(s.price)}</td><td>${(s.risk*100)}%</td><td>${s.owned} unit</td><td><button class='btn btn-buy' onclick='tradeShadow(${i}, true)'>Beli</button> <button class='btn btn-sell' onclick='tradeShadow(${i}, false)'>Penyelundupan (+45%)</button></td></tr>`;
+            });
+            document.getElementById("blackmarket-table-body").innerHTML = bmHTML;
+
+            document.getElementById("property-list").innerHTML = properties.map((p, i) => `<div class='card-item'><h4>${p.name}</h4><p>Harga: ${formatUSD(p.price)} | Sewa Bulanan: <span class='up'>${formatUSD(p.rent)}</span></p><p>Kepemilikan: <b>${p.owned}</b></p><button class='btn btn-buy' onclick='buyProperty(${i})'>Beli Aset</button></div>`).join('');
+
+            document.getElementById("corporate-list").innerHTML = corporates.map((c, i) => `<div class='card-item'><h4>${c.name}</h4><p>Harga Akuisisi: ${formatUSD(c.price)} | Dividen Bulanan: <span class='up'>${formatUSD(c.dividend)}</span></p><button class='btn btn-action' onclick='buyCorporate(${i})' ${c.owned?'disabled':''}>${c.owned?'Sudah Diakuisisi':'Akuisisi Kontrol'}</button></div>`).join('');
+
+            document.getElementById("network-list").innerHTML = networkVIP.map((n, i) => `<div class='card-item'><h4>${n.name}</h4><p>Biaya Konsesi: ${formatUSD(n.cost)}</p><p><small style='color:#cbd5e1;'>${n.desc}</small></p><button class='btn btn-action' onclick='executeVIP(${i})'>Eksekusi Lobi</button></div>`).join('');
+
+            document.getElementById("career-list").innerHTML = jobs.map(j => `<div class='card-item'><h4>${j.name}</h4><p>Gaji Pokok: <span class='up'>${formatUSD(j.salary)}/Bln</span></p><p><small>Syarat: 🧠 ${j.reqAna} Pts, 🤝 ${j.reqNet} Pts</small></p><button class='btn btn-action' onclick='applyJob("${j.id}")' ${game.jobName===j.name?'disabled':''}>${game.jobName===j.name?'Menjabat':'Lamar Jabatan'}</button></div>`).join('');
+
+            document.getElementById("spy-target-select").innerHTML = assets.map(a => `<option value='${a.id}'>${a.id} - ${a.name}</option>`).join('');
+            document.getElementById("bonds-list").innerHTML = game.bonds.length === 0 ? "Tidak ada obligasi aktif." : game.bonds.map(b => `<div>• $${b.amount} (Jatuh tempo: ${b.days} Hari lagi)</div>`).join('');
+            document.getElementById("quick-log-container").innerHTML = game.logs.slice(0, 4).map(l => `<div class='mini-feed'>${l.msg}</div>`).join('');
+        }
+
+        function formatUSD(n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2 }); }
+        window.onload = function() { updateUI(); checkTutorialOnLoad(); };
+    </script>
+</body>
+</html>
