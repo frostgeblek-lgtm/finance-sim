@@ -1,1381 +1,1912 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Capitalist</title> 
-        <style>
-        :root {
-            --bg-color: #121824; 
-            --card-bg: #1F2937;  
-            --text-color: #f8fafc;
-            --green: #10b981;    
-            --red: #ef4444;
-            --accent: #3b82f6;
-            --orange: #f59e0b;   
-            --purple: #a855f7;
-            --teal: #14b8a6;
-            --dark-gray: #374151;
-        }
-
-        *, *::before, *::after { box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color); color: var(--text-color);
-            margin: 0; padding: 20px; line-height: 1.4; user-select: none;
-        }
-
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(135deg, var(--card-bg), #0f172a);
-            padding: 20px 25px; border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4); margin-bottom: 20px; border: 1px solid var(--dark-gray);
-        }
-
-        .btn-next-day {
-            background: linear-gradient(135deg, var(--orange), #d97706);
-            color: white; border: none; padding: 14px 28px; border-radius: 8px;
-            cursor: pointer; font-weight: bold; font-size: 16px;
-            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3); transition: all 0.2s;
-        }
-        .btn-next-day:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5); }
-
-        .stats-container {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px; margin-bottom: 20px;
-        }
-        .stat-card {
-            background: var(--card-bg); padding: 15px; border-radius: 10px;
-            text-align: center; border: 1px solid var(--dark-gray); border-left: 4px solid var(--accent);
-        }
-        .stat-card.money { border-left-color: var(--green); }
-        .stat-card.debt { border-left-color: var(--red); }
-        .stat-card.career { border-left-color: var(--purple); }
-        .stat-card.network { border-left-color: var(--teal); }
-        .stat-card h3 { margin: 0 0 5px 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-card p { margin: 0; font-size: 19px; font-weight: bold; font-family: 'Courier New', monospace; }
-
-        .matrix-container {
-            background: var(--card-bg); padding: 15px; border-radius: 12px;
-            border: 1px solid var(--dark-gray); margin-bottom: 20px;
-        }
-        .matrix-title-area {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-        }
-        .matrix-bar-stack {
-            display: flex; height: 18px; border-radius: 6px; overflow: hidden; background: #111827; margin-bottom: 12px;
-        }
-        .matrix-segment { height: 100%; transition: width 0.3s ease; }
-        .matrix-legend { display: flex; flex-wrap: wrap; gap: 15px; font-size: 12px; }
-        .legend-item { display: flex; align-items: center; gap: 5px; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
-
-        .switch-container {
-            display: flex; align-items: center; gap: 10px; background: #111827; padding: 8px 15px; border-radius: 8px; border: 1px solid var(--dark-gray);
-        }
-        .switch-btn {
-            position: relative; width: 44px; height: 22px; background: #4b5563; border-radius: 11px; cursor: pointer; transition: background 0.2s;
-        }
-        .switch-btn::after {
-            content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: left 0.2s;
-        }
-        .switch-btn.active { background: var(--green); }
-        .switch-btn.active::after { left: 24px; }
-
-        .main-layout { display: grid; grid-template-columns: 2.7fr 1fr; gap: 20px; }
-        @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr; } }
-
-        .panel { background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--dark-gray); }
-        .panel h2 { margin-top: 0; border-bottom: 2px solid var(--dark-gray); padding-bottom: 10px; font-size: 18px; color: var(--orange); }
-
-        .tabs { display: flex; gap: 6px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .tab-btn {
-            background: #111827; color: white; border: 1px solid var(--dark-gray);
-            padding: 10px 14px; border-radius: 6px; cursor: pointer; white-space: nowrap; font-size: 13px; transition: background 0.2s;
-        }
-        .tab-btn:hover { background: #374151; }
-        .tab-btn.active { background: var(--accent); border-color: var(--accent); font-weight: bold; }
-
-        .search-container { display: flex; gap: 10px; margin-bottom: 15px; }
-        .search-input {
-            flex: 1; background: #111827; color: white; border: 1px solid var(--dark-gray);
-            padding: 10px 15px; border-radius: 6px; font-size: 14px;
-        }
-
-        .table-wrapper { max-height: 500px; overflow-y: auto; border: 1px solid var(--dark-gray); border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th, td { padding: 12px 10px; border-bottom: 1px solid var(--dark-gray); font-size: 13px; }
-        th { color: #94a3b8; background-color: #111827; position: sticky; top: 0; z-index: 10; }
-
-        .clickable-asset { cursor: pointer; color: var(--accent); font-weight: bold; }
-        .clickable-asset:hover { color: var(--orange); text-decoration: underline; }
-
-        .input-qty { width: 70px; background: #111827; color: white; border: 1px solid #475569; padding: 4px; border-radius: 4px; text-align: center; }
-        .btn { color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
-        .btn:disabled { background-color: #334155 !important; color: #64748b !important; cursor: not-allowed; }
-        .btn-buy { background-color: var(--green); }
-        .btn-sell { background-color: var(--red); }
-        .btn-action { background-color: var(--accent); }
-
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .up { color: var(--green); font-weight: bold; }
-        .down { color: var(--red); font-weight: bold; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 8000; }
-        .modal-content { background: #121824; width: 90%; max-width: 700px; height: 75vh; border-radius: 16px; border: 2px solid var(--orange); display: flex; flex-direction: column; overflow: hidden; }
-        .modal-header { background: #1f2937; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--orange); }
-        .log-box { flex: 1; padding: 20px; overflow-y: auto; font-family: 'Courier New', monospace; background-color: #0b0f19; }
-        .log-entry { margin-bottom: 6px; padding: 6px; border-radius: 4px; background: #1f2937; font-size: 12px; border-left: 3px solid var(--accent); }
-
-        #chart-modal-content { max-width: 600px; height: auto; padding-bottom: 20px; }
-        .chart-container-box { padding: 20px; background: #0b0f19; display: flex; flex-direction: column; align-items: center; }
-        .big-chart-canvas { background: #070a12; border: 1px solid var(--dark-gray); border-radius: 8px; width: 100%; max-width: 540px; height: 240px; }
-
-        .hidden { display: none !important; }
-        .card-item { background: #111827; padding: 15px; border-radius: 8px; border: 1px solid var(--dark-gray); margin-bottom: 12px; }
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 12px 20px; border-radius: 8px; color: white; font-weight: bold; font-size: 13px; }
-
-        #quick-log-container { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
-        .mini-feed { padding: 6px 10px; border-radius: 4px; background: #111827; font-size: 11.5px; border-left: 3px solid #475569; }
-
-        @keyframes pop-in {
-            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes blink-alert {
-            0% { background-color: #7f1d1d; opacity: 1; }
-            50% { background-color: #991b1b; opacity: 0.7; }
-            100% { background-color: #7f1d1d; opacity: 1; }
-        }
-
-        #tutorial-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent; 
-            z-index: 999999 !important; 
-            display: flex; flex-direction: column; 
-            justify-content: flex-start; 
-            align-items: center; 
-            padding-top: 30px; 
-            pointer-events: none;
-        }
-        .tutorial-box {
-            background: #1f2937; border: 3px solid var(--orange); border-radius: 12px;
-            padding: 20px; width: 90%; max-width: 450px; text-align: center; 
-            box-shadow: 0 15px 50px rgba(0,0,0,0.95); color: white; 
-            animation: pop-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-            z-index: 9999999 !important; 
-            pointer-events: auto;
-        }
-        .tutorial-highlight {
-            position: relative; 
-            z-index: 99998 !important; 
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85), 0 0 25px rgba(245, 158, 11, 1) !important;
-            background-color: var(--card-bg) !important; pointer-events: auto !important;
-        }
-        .tutorial-btn-next { background: var(--green); color: white; border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 12px; }
-        body.tutorial-locked { overflow: hidden !important; touch-action: none; }
-        
-        .company-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 15px; }
-        .company-stat-box { background: #111827; padding: 12px; border-radius: 6px; border: 1px solid var(--dark-gray); text-align: center; }
-        .company-stat-box h4 { margin: 0 0 5px 0; font-size: 11px; color: #cbd5e1; text-transform: uppercase; }
-        .company-stat-box p { margin: 0; font-size: 16px; font-weight: bold; font-family: 'Courier New', monospace; }
-        .strike-alert { animation: blink-alert 1.5s infinite; color: white; padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; margin-top: 12px; border: 1px solid var(--red); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance & Investment</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        slate: { 950: '#0a0f1e' },
+        brand: { DEFAULT: '#38bdf8', dark: '#0ea5e9' }
+      },
+      fontFamily: {
+        mono: ['JetBrains Mono', 'Courier New', 'monospace'],
+        sans: ['Inter', 'system-ui', 'sans-serif']
+      }
+    }
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0a0f1e; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+  
+  .glass { background: rgba(15,23,42,0.8); backdrop-filter: blur(12px); border: 1px solid rgba(148,163,184,0.1); }
+  .glass-card { background: rgba(15,23,42,0.9); border: 1px solid rgba(148,163,184,0.08); border-radius: 12px; }
+  
+  .neon-green { color: #4ade80; }
+  .neon-red { color: #f87171; }
+  .neon-blue { color: #38bdf8; }
+  .neon-yellow { color: #fbbf24; }
+  .neon-purple { color: #a78bfa; }
+  
+  .tab-btn { transition: all 0.2s; border-bottom: 2px solid transparent; }
+  .tab-btn.active { color: #38bdf8; border-bottom-color: #38bdf8; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  
+  .toast-item { animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  
+  .pulse-green { animation: pulseG 2s infinite; }
+  @keyframes pulseG { 0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); } 50% { box-shadow: 0 0 0 6px rgba(74,222,128,0); } }
+  
+  .btn-primary { background: linear-gradient(135deg, #0ea5e9, #6366f1); border: none; transition: all 0.2s; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(14,165,233,0.3); }
+  .btn-primary:active { transform: translateY(0); }
+  
+  .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); border: none; transition: all 0.2s; }
+  .btn-danger:hover { opacity: 0.9; transform: translateY(-1px); }
+  
+  .btn-success { background: linear-gradient(135deg, #22c55e, #16a34a); border: none; transition: all 0.2s; }
+  .btn-success:hover { opacity: 0.9; transform: translateY(-1px); }
+  
+  .btn-warn { background: linear-gradient(135deg, #f59e0b, #d97706); border: none; transition: all 0.2s; }
+  .btn-warn:hover { opacity: 0.9; transform: translateY(-1px); }
+  
+  .mini-chart { position: relative; width: 100%; height: 40px; }
+  
+  .log-entry { border-left: 3px solid; padding: 6px 10px; margin: 4px 0; border-radius: 0 6px 6px 0; font-size: 0.78rem; }
+  .log-info { border-color: #38bdf8; background: rgba(56,189,248,0.05); }
+  .log-gain { border-color: #4ade80; background: rgba(74,222,128,0.05); }
+  .log-loss { border-color: #f87171; background: rgba(248,113,113,0.05); }
+  .log-event { border-color: #fbbf24; background: rgba(251,191,36,0.05); }
+  .log-warn { border-color: #a78bfa; background: rgba(167,139,250,0.05); }
+  
+  .progress-bar { height: 6px; border-radius: 3px; background: rgba(148,163,184,0.15); overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+  
+  input[type="number"] { background: rgba(30,41,59,0.8); border: 1px solid rgba(148,163,184,0.15); color: #e2e8f0; border-radius: 6px; padding: 6px 10px; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
+  input[type="number"]:focus { border-color: #38bdf8; }
+  input[type="number"]::-webkit-inner-spin-button { opacity: 0.5; }
+  
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em; }
+  
+  .economy-GROWTH { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+  .economy-BOOM { background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); }
+  .economy-RECESSION { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+  .economy-DEPRESSION { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+  
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: rgba(15,23,42,0.5); }
+  ::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.35); }
+  
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-box { background: #0f172a; border: 1px solid rgba(148,163,184,0.15); border-radius: 16px; padding: 32px; max-width: 500px; width: 90%; }
+  
+  .net-worth-bar { height: 8px; background: linear-gradient(90deg, #6366f1, #38bdf8, #4ade80); border-radius: 4px; }
+  
+  .ticker-flash-up { animation: flashUp 0.5s ease; }
+  .ticker-flash-down { animation: flashDown 0.5s ease; }
+  @keyframes flashUp { 0% { background: rgba(74,222,128,0.3); } 100% { background: transparent; } }
+  @keyframes flashDown { 0% { background: rgba(248,113,113,0.3); } 100% { background: transparent; } }
+  
+  .end-turn-btn { position: relative; overflow: hidden; }
+  .end-turn-btn::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%); transform: translateX(-100%); transition: transform 0.5s; }
+  .end-turn-btn:hover::after { transform: translateX(100%); }
+</style>
 </head>
-<body>
+<body class="text-slate-200 min-h-screen">
 
-    <div id="toast-container"></div>
+<!-- MODAL: Game Over / Win -->
+<div id="gameModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box text-center">
+    <div id="modalIcon" class="text-6xl mb-4"></div>
+    <h2 id="modalTitle" class="text-2xl font-bold mb-2"></h2>
+    <p id="modalSubtitle" class="text-slate-400 mb-2"></p>
+    <p id="modalStats" class="text-slate-300 text-sm mb-6 font-mono"></p>
+    <button onclick="restartGame()" class="btn-primary text-white font-semibold py-3 px-8 rounded-lg cursor-pointer">Play Again</button>
+  </div>
+</div>
 
-    <div id="tutorial-overlay" class="hidden">
-        <div class="tutorial-box">
-            <h3 style="margin-top:0; color:var(--orange);" id="tutorial-title">Panduan</h3>
-            <p id="tutorial-text" style="font-size:14px; line-height:1.5;"></p>
-            <button class="tutorial-btn-next" id="tutorial-btn" onclick="nextTutorialStep()">Lanjut &raquo;</button>
-        </div>
+<!-- MODAL: Event Alert -->
+<div id="eventModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="flex items-center gap-3 mb-4">
+      <span id="eventIcon" class="text-3xl"></span>
+      <div>
+        <h3 id="eventTitle" class="text-lg font-bold text-yellow-400"></h3>
+        <p class="text-slate-500 text-xs">Life Event</p>
+      </div>
     </div>
+    <p id="eventDesc" class="text-slate-300 text-sm mb-6 leading-relaxed"></p>
+    <div id="eventChoices" class="space-y-2"></div>
+    <button id="eventDismiss" onclick="dismissEvent()" class="mt-4 w-full btn-primary text-white font-semibold py-2.5 rounded-lg cursor-pointer" style="display:none;">Continue</button>
+  </div>
+</div>
 
-    <header id="tour-header">
+<!-- HEADER -->
+<header class="glass sticky top-0 z-50 px-4 py-3">
+  <div class="max-w-screen-2xl mx-auto flex items-center justify-between flex-wrap gap-3">
+    <div class="flex items-center gap-3">
+      <div class="text-xl font-bold neon-blue font-mono tracking-tight">FINANCE & INVESTMENT</div>
+      <div class="h-4 w-px bg-slate-700"></div>
+      <span class="text-slate-500 text-xs">The Market Master</span>
+    </div>
+    
+    <div class="flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-1.5">
+        <span class="text-slate-500 text-xs">AGE</span>
+        <span id="hdrAge" class="font-mono font-bold text-white text-sm">18</span>
+      </div>
+      <div class="h-4 w-px bg-slate-700"></div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-slate-500 text-xs">MONTH</span>
+        <span id="hdrMonth" class="font-mono text-sm text-slate-300">Jan 1990</span>
+      </div>
+      <div class="h-4 w-px bg-slate-700"></div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-slate-500 text-xs">CASH</span>
+        <span id="hdrCash" class="font-mono font-bold neon-green text-sm">$10,000</span>
+      </div>
+      <div class="h-4 w-px bg-slate-700"></div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-slate-500 text-xs">NET WORTH</span>
+        <span id="hdrNetWorth" class="font-mono font-bold text-white text-sm">-$20,000</span>
+      </div>
+      <div class="h-4 w-px bg-slate-700"></div>
+      <div id="hdrEconomy" class="badge economy-GROWTH">● GROWTH</div>
+    </div>
+    
+    <button onclick="endTurn()" id="endTurnBtn" class="end-turn-btn btn-primary text-white font-bold py-2.5 px-6 rounded-lg cursor-pointer text-sm tracking-wide pulse-green">
+      ▶ END TURN
+    </button>
+  </div>
+</header>
+
+<!-- PROGRESS: Net Worth to Goal -->
+<div class="px-4 py-1.5 bg-slate-900/50 border-b border-slate-800">
+  <div class="max-w-screen-2xl mx-auto flex items-center gap-3">
+    <span class="text-slate-500 text-xs whitespace-nowrap">Goal: $2M</span>
+    <div class="flex-1 progress-bar">
+      <div id="goalProgress" class="progress-fill net-worth-bar" style="width:0%"></div>
+    </div>
+    <span id="goalPct" class="text-slate-500 text-xs font-mono whitespace-nowrap">0.0%</span>
+    <div class="h-3 w-px bg-slate-700 mx-1"></div>
+    <span class="text-slate-500 text-xs whitespace-nowrap">Turn <span id="hdrTurn" class="text-slate-300">1</span></span>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="max-w-screen-2xl mx-auto px-4 py-4 flex gap-4">
+
+  <!-- SIDEBAR: Financial Statement -->
+  <aside class="w-72 shrink-0 space-y-3">
+    
+    <!-- Income Statement -->
+    <div class="glass-card p-4">
+      <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Income Statement</h3>
+      <div class="space-y-1.5 text-sm">
+        <div class="text-slate-500 text-xs uppercase tracking-wider mt-1 mb-1">Income</div>
+        <div class="flex justify-between"><span class="text-slate-400">Salary</span><span id="incomeSalary" class="font-mono neon-green">$3,500</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Dividends</span><span id="incomeDivs" class="font-mono neon-green">$0</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Rental</span><span id="incomeRental" class="font-mono neon-green">$0</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Savings Int.</span><span id="incomeSavings" class="font-mono neon-green">$0</span></div>
+        <div class="flex justify-between border-t border-slate-700 pt-1.5 mt-1.5"><span class="text-slate-300 font-medium">Total In</span><span id="totalIncome" class="font-mono neon-green font-bold">$3,500</span></div>
+        
+        <div class="text-slate-500 text-xs uppercase tracking-wider mt-3 mb-1">Expenses</div>
+        <div class="flex justify-between"><span class="text-slate-400">Living</span><span id="expLiving" class="font-mono neon-red">-$2,000</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Loan Payment</span><span id="expLoan" class="font-mono neon-red">-$300</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Insurance</span><span id="expInsurance" class="font-mono neon-red">-$0</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Prop. Costs</span><span id="expProperty" class="font-mono neon-red">-$0</span></div>
+        <div class="flex justify-between border-t border-slate-700 pt-1.5 mt-1.5"><span class="text-slate-300 font-medium">Total Out</span><span id="totalExpenses" class="font-mono neon-red font-bold">-$2,300</span></div>
+        
+        <div class="flex justify-between border-t-2 border-slate-600 pt-2 mt-2">
+          <span class="text-white font-bold">Net Cash Flow</span>
+          <span id="netCashFlow" class="font-mono font-bold text-lg">$1,200</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Balance Sheet -->
+    <div class="glass-card p-4">
+      <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Balance Sheet</h3>
+      <div class="space-y-1.5 text-sm">
+        <div class="text-slate-500 text-xs uppercase tracking-wider mb-1">Assets</div>
+        <div class="flex justify-between"><span class="text-slate-400">Cash</span><span id="bsCash" class="font-mono text-white">$10,000</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Stocks</span><span id="bsStocks" class="font-mono text-white">$0</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Crypto</span><span id="bsCrypto" class="font-mono text-white">$0</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Real Estate</span><span id="bsRE" class="font-mono text-white">$0</span></div>
+        <div class="flex justify-between border-t border-slate-700 pt-1.5 mt-1.5"><span class="text-slate-300 font-medium">Total Assets</span><span id="bsTotalAssets" class="font-mono neon-blue font-bold">$10,000</span></div>
+        
+        <div class="text-slate-500 text-xs uppercase tracking-wider mt-3 mb-1">Liabilities</div>
+        <div class="flex justify-between"><span class="text-slate-400">Student Loan</span><span id="bsStudentLoan" class="font-mono neon-red">$30,000</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Mortgages</span><span id="bsMortgage" class="font-mono neon-red">$0</span></div>
+        <div class="flex justify-between border-t border-slate-700 pt-1.5 mt-1.5"><span class="text-slate-300 font-medium">Total Liab.</span><span id="bsTotalLiab" class="font-mono neon-red font-bold">$30,000</span></div>
+        
+        <div class="flex justify-between border-t-2 border-slate-600 pt-2 mt-2">
+          <span class="text-white font-bold">Net Worth</span>
+          <span id="bsNetWorth" class="font-mono font-bold text-lg">-$20,000</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Credit Score & Stats -->
+    <div class="glass-card p-4">
+      <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Player Stats</h3>
+      <div class="space-y-3">
         <div>
-            <h1 style="margin:0; font-size: 26px; color: var(--orange);">The Capitalist</h1>
-            <small style="color: #94a3b8;">Advance Finance & Investment Simulation</small>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-slate-400">Credit Score</span>
+            <span id="creditScoreVal" class="font-mono neon-yellow">680</span>
+          </div>
+          <div class="progress-bar">
+            <div id="creditScoreBar" class="progress-fill" style="width:34%;background:linear-gradient(90deg,#f87171,#fbbf24,#4ade80)"></div>
+          </div>
+          <div id="creditScoreLabel" class="text-xs text-slate-500 mt-0.5 text-right">Good</div>
         </div>
         <div>
-            <button class="btn-next-day" id="tour-nextday-btn" onclick="nextDay()">HARI BERIKUTNYA⏩</button>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-slate-400">Inflation Rate</span>
+            <span id="inflationVal" class="font-mono text-slate-300">2.0%</span>
+          </div>
+          <div class="progress-bar">
+            <div id="inflationBar" class="progress-fill" style="width:20%;background:#f59e0b"></div>
+          </div>
         </div>
-    </header>
-
-    <div class="matrix-container">
-        <div class="matrix-title-area">
-            <h3>🧠 The Smart Wealth Matrix & Asset Allocation</h3>
-            <div class="switch-container">
-                <span style="font-size: 11.5px; color: #cbd5e1;">Auto-Compounding Pipeline</span>
-                <div id="compounding-switch" class="switch-btn" onclick="toggleAutoCompounding()"></div>
-            </div>
-        </div>
-        <div class="matrix-bar-stack">
-            <div id="bar-cash" class="matrix-segment" style="background: #10b981; width: 100%;"></div>
-            <div id="bar-stocks" class="matrix-segment" style="background: #3b82f6; width: 0%;"></div>
-            <div id="bar-properties" class="matrix-segment" style="background: #eab308; width: 0%;"></div>
-            <div id="bar-bonds" class="matrix-segment" style="background: #14b8a6; width: 0%;"></div>
-        </div>
-        <div class="matrix-legend">
-            <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div> Kas: <span id="lbl-matrix-cash">$0</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div> Saham: <span id="lbl-matrix-stocks">$0</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background:#eab308;"></div> Real Estate: <span id="lbl-matrix-properties">$0</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background:#14b8a6;"></div> Obligasi: <span id="lbl-matrix-bonds">$0</span></div>
-            <div class="legend-item" style="margin-left: auto; color: var(--orange); font-weight: bold;">Net Worth: <span id="lbl-matrix-total">$0</span></div>
-        </div>
-    </div>
-
-    <div class="stats-container">
-        <div class="stat-card money">
-            <h3>Uang</h3>
-            <p id="txt-cash">$10,000.00</p>
-        </div>
-        <div class="stat-card debt">
-            <h3>Utang Bank</h3>
-            <p id="txt-debt">$0.00</p>
-        </div>
-        <div class="stat-card">
-            <h3>Kalender</h3>
-            <p id="txt-date">1 Januari 1990</p>
-        </div>
-        <div class="stat-card career" id="tour-card-career">
-            <h3>Jabatan</h3>
-            <p id="txt-job">Unemployed</p>
-        </div>
-        <div class="stat-card network">
-            <h3>Relasi & Analisis</h3>
-            <p id="txt-network">🤝 0 | 🧠 0 Pts</p>
-        </div>
-        <div class="stat-card" style="border-left-color: var(--orange);">
-            <h3>Siklus & Inflasi Makro</h3>
-            <p id="txt-macro-cycle">Recovery (2.0%)</p>
-        </div>
-        <div class="stat-card" style="border-left-color: var(--purple);">
-            <h3>Suku Bunga Acuan</h3>
-            <p id="txt-macro-rate">6.00%</p>
-        </div>
-        <div class="stat-card" style="border-left-color: var(--teal);">
-            <h3>Sentimen & Likuiditas</h3>
-            <p id="txt-macro-sentiment">M2: $1.00M | 💸 50</p>
-        </div>
-    </div>
-
-    <div class="main-layout">
         <div>
-            <div class="tabs" id="tour-tabs-row">
-                <button class="tab-btn active" id="tab-btn-market" onclick="switchTab(event, 'tab-market')">📊Saham</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-blackmarket')">🕵️ Pasar Gelap</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-mycorporate')">🏭 Perusahaan Saya</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-property')">🏢 Real Estate</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-corporate')">🏭 Korporasi</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-network')">🤝 Relasi</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-bank')">💰Bank</button>
-                <button class="tab-btn" id="tab-btn-career" onclick="switchTab(event, 'tab-career')">✉️Lowongan Kerja</button>
-                <button class="tab-btn" onclick="switchTab(event, 'tab-spy')">🧠 Riset & Sabotase</button>
-            </div>
-
-            <div id="tab-market" class="panel">
-                <h2>Perdagangan Global</h2>
-                <div class="search-container">
-                    <input type="text" id="market-search" class="search-input" placeholder="🔍 Cari kode emiten atau nama perusahaan..." oninput="updateUI()">
-                </div>
-                <div class="table-wrapper" id="tour-market-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Aset / Kode (Klik Untuk Grafik)</th>
-                                <th>Sektor</th>
-                                <th>Harga Pasar</th>
-                                <th>P/E Rasio</th>
-                                <th>Kepemilikan</th>
-                                <th>Kuantitas</th>
-                                <th>Aksi Operasional</th>
-                            </tr>
-                        </thead>
-                        <tbody id="market-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="tab-blackmarket" class="panel hidden">
-                <h2>🕵️ Aliran Komoditas Pasar Gelap (Shadow Market)</h2>
-                <p style="font-size:12px; color:#94a3b8;">Komoditas ilegal bergerak berlawanan dengan pasar reguler. Hati-hati dengan resiko razia harian!</p>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Komoditas</th>
-                                <th>Harga Kontraband</th>
-                                <th>Risiko Razia</th>
-                                <th>Kepemilikan</th>
-                                <th>Eksekusi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="blackmarket-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="tab-mycorporate" class="panel hidden">
-                <h2>Ayo bangun Perusahaan pribadi mu</h2>
-                <p style="font-size:13px; color:#cbd5e1; margin-bottom:15px;">Ayo Bangun kerajaan bisnis manufaktur Anda sendiri. Sistem ini memiliki beragam mekanisme meliputi pengadaan bahan baku, manajemen tenaga kerja, evolusi R&D, serta pendanaan surat utang (Obligasi).</p>
-                
-                <div id="company-setup-view">
-                    <div style="background:#111827; padding:20px; border-radius:10px; border:2px dashed var(--orange); text-align:center;">
-                        <h3>Mendirikan PT (Perseroan Terbatas) Baru</h3>
-                        <p style="color:#94a3b8; font-size:13px;">Dibutuhkan kapital modal yang besar serta kekuatan Relasi untuk mendapatkan izin dari birokrasi perizinan dagang internasional.</p>
-                        <div style="margin: 15px 0; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
-                            <input type="text" id="mycorp-input-name" class="search-input" style="max-width:250px;" placeholder="Nama Perusahaan Anda">
-                            <select id="mycorp-select-type" class="search-input" style="max-width:180px;">
-                                <option value="Konsumer">Sektor Konsumer</option>
-                                <option value="Teknologi">Sektor Teknologi</option>
-                                <option value="Energi">Sektor Energi</option>
-                            </select>
-                        </div>
-                        <p style="font-weight:bold; color:var(--orange);">Biaya Pendirian: $1,000,000.00</p>
-                        <button class="btn btn-buy" style="padding:10px 20px;" onclick="establishMyCompany()">Buat Perusahaan</button>
-                    </div>
-                </div>
-
-                <div id="company-dashboard-view" class="hidden">
-                    <div style="background:linear-gradient(135deg, #1f2937, #111827); padding:15px; border-radius:8px; border:1px solid var(--orange); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-                        <div>
-                            <h3 id="mycorp-lbl-name" style="margin:0; color:var(--orange); font-size:20px;">PT. Syarikat Jaya</h3>
-                            <small id="mycorp-lbl-type" style="color:#94a3b8;">Sektor: Konsumer</small>
-                            <div style="margin-top:5px; font-size:13px; font-weight:bold; color:var(--green);" id="mycorp-lbl-product">Produk Aktif: Makanan Kaleng (Tier 1)</div>
-                        </div>
-                        <div style="margin-left:auto; text-align:right;">
-                            <span style="font-size:12px; color:#cbd5e1;">Skala Operasional:</span>
-                            <div id="mycorp-lbl-level" style="font-size:18px; font-weight:bold; color:var(--teal);">Level 1</div>
-                        </div>
-                    </div>
-
-                    <div id="mycorp-strike-alert" class="strike-alert hidden">
-                        ⚠️ PERINGATAN: BURUH MOGOK KERJA MASSAL! Efisiensi Produksi 0%. Segera naikkan kebijakan upah!
-                    </div>
-
-                    <div class="company-grid">
-                        <div class="company-stat-box">
-                            <h4>Karyawan (Buruh)</h4>
-                            <p id="mycorp-stat-employees">0 Orang</p>
-                        </div>
-                        <div class="company-stat-box">
-                            <h4>Efisiensi Produksi</h4>
-                            <p id="mycorp-stat-efficiency">50.0%</p>
-                        </div>
-                        <div class="company-stat-box">
-                            <h4>Bahan Baku (Gudang)</h4>
-                            <p id="mycorp-stat-raw">0 Unit</p>
-                        </div>
-                        <div class="company-stat-box">
-                            <h4>Produk Jadi (Goods)</h4>
-                            <p id="mycorp-stat-goods">0 Unit</p>
-                        </div>
-                        <div class="company-stat-box" style="border-color:var(--accent);">
-                            <h4>Distributor Resmi</h4>
-                            <p id="mycorp-stat-dist">1 Jalur</p>
-                        </div>
-                        <div class="company-stat-box" style="border-color:var(--red);">
-                            <h4>Distributor Pasar Gelap</h4>
-                            <p id="mycorp-stat-shadowdist">0 Jalur</p>
-                        </div>
-                    </div>
-
-                    <div class="grid-2" style="margin-top:15px;">
-                        <div style="background:#111827; padding:15px; border-radius:8px; border:1px solid var(--dark-gray);">
-                            <h3 style="margin-top:0; color:var(--green); font-size:14px;">🏭 Manajemen Rantai Pasok & Tenaga Kerja</h3>
-                            <div style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span>Beli Bahan Baku Pasokan <span id="mycorp-lbl-rawcost">($40/Unit)</span>:</span>
-                                    <button class="btn btn-buy" onclick="buyCompanyMaterials()">Beli +50 Unit</button>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span>Kebijakan Upah Pegawai:</span>
-                                    <select id="mycorp-select-wage" class="search-input" style="width:140px; padding:4px;" onchange="changeWagePolicy()">
-                                        <option value="Minimum">Minimum ($800/Bln)</option>
-                                        <option value="Standard">Standar ($1,500/Bln)</option>
-                                        <option value="Premium">Premium ($2,500/Bln)</option>
-                                    </select>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span>Rekrut Karyawan Baru:</span>
-                                    <button class="btn btn-action" onclick="hireCompanyEmployee()">Rekrut Karyawan ($3,000)</button>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span>Upgrade Efisiensi Mesin:</span>
-                                    <button class="btn btn-action" onclick="upgradeCompanyEfficiency()">Upgrade Efisiensi ($35,000 + 10 Pts)</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="background:#111827; padding:15px; border-radius:8px; border:1px solid var(--dark-gray);">
-                            <h3 style="margin-top:0; color:var(--purple); font-size:14px;">📣 Promosi, Logistik & Pasar Gelap</h3>
-                            <div style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span>Suntik Anggaran Iklan Pemasaran:</span>
-                                    <button class="btn btn-buy" onclick="boostCompanyMarketing()">Iklan Ekspres ($5,000)</button>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span>Ekspansi Jalur Agen Resmi:</span>
-                                    <button class="btn btn-action" onclick="expandLegalDistributor()">Kontrak Agen ($20,000)</button>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="color:var(--orange);">Suap Penyelundup (Shadow Agent):</span>
-                                    <button class="btn btn-sell" onclick="hireBlackMarketDistributor()">Sewa Distributor ($45,000)</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid-2" style="margin-top:15px;">
-                        <div style="background:#111827; padding:15px; border-radius:8px; border:1px solid var(--dark-gray);">
-                            <h3 style="margin-top:0; color:var(--accent); font-size:14px;">🔬 R&D: Evolusi Lini Produk</h3>
-                            <p style="font-size:12px; color:#cbd5e1; margin-top:0;">Tingkatkan generasi komoditas PT Anda untuk melipatgandakan margin laba. Semakin canggih produk, semakin mendominasi pasar reguler.</p>
-                            <button class="btn btn-action" style="width:100%;" onclick="upgradeProductTier()">Evolusi Riset Produk (Cost Tergantung Tier)</button>
-                        </div>
-                        
-                        <div style="background:#111827; padding:15px; border-radius:8px; border:1px solid var(--dark-gray);">
-                            <h3 style="margin-top:0; color:var(--teal); font-size:14px;">🏦 Obligasi Korporat (Corporate Bonds)</h3>
-                            <p style="font-size:12px; color:#cbd5e1; margin-top:0;">Terbitkan surat utang PT (Tenor 60 Hari) untuk ekspansi instan. Beban bunga harian setara 8% bulanan.</p>
-                            <div style="display:flex; gap:10px;">
-                                <input type="number" id="mycorp-input-bond" class="input-qty" style="flex:1;" placeholder="Nominal Limit: Level x $100k">
-                                <button class="btn btn-buy" onclick="issueCorporateBond()">Terbitkan</button>
-                            </div>
-                            <div id="mycorp-bond-list" style="margin-top:10px; font-size:11px; color:var(--orange); max-height:60px; overflow-y:auto;">Tidak ada obligasi PT aktif.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-property" class="panel hidden">
-                <h2>Portofolio Real Estate Progresif</h2>
-                <div id="property-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;"></div>
-            </div>
-
-            <div id="tab-corporate" class="panel hidden">
-                <h2>Merger & Akuisisi Holding Korporasi</h2>
-                <div id="corporate-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;"></div>
-            </div>
-
-            <div id="tab-network" class="panel hidden">
-                <h2>Hub Lobi Sirkel Orang Penting</h2>
-                <div id="network-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;"></div>
-            </div>
-
-            <div id="tab-bank" class="panel hidden">
-                <h2>Manajemen Finansial Makro Bank</h2>
-                <div class="grid-2">
-                    <div style="background: #111827; padding:15px; border-radius:8px; border: 1px solid var(--dark-gray);">
-                        <h3>Kredit Plafon Ekspres</h3>
-                        <p>Limit Maksimal: <span class="up" id="txt-credit-limit">$5,000</span></p>
-                        <input type="number" id="input-borrow" class="input-qty" style="width:120px;" placeholder="Nominal">
-                        <button class="btn btn-sell" onclick="borrowMoney()">Ambil Pinjaman</button>
-                        <hr style="border-color:var(--dark-gray); margin:15px 0;">
-                        <input type="number" id="input-repay" class="input-qty" style="width:120px;" placeholder="Nominal">
-                        <button class="btn btn-buy" onclick="repayDebt()">Bayar Utang</button>
-                    </div>
-                    <div style="background: #111827; padding:15px; border-radius:8px; border: 1px solid var(--dark-gray);">
-                        <h3>Obligasi Terstruktur Bank</h3>
-                        <input type="number" id="input-bond" class="input-qty" style="width:120px;" placeholder="Nominal">
-                        <button class="btn btn-action" onclick="buyBond()">Beli Obligasi (30 Hari, Bunga 5%)</button>
-                        <h4 style="margin-top:15px;">Portofolio Obligasi:</h4>
-                        <div id="bonds-list" style="font-size:12px; color:var(--orange)">Tidak ada obligasi aktif.</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-career" class="panel hidden">
-                <h2>Bursa Karir Komprehensif</h2>
-                <div id="career-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;"></div>
-            </div>
-
-            <div id="tab-spy" class="panel hidden">
-                <h2>Pusat Riset & Sabotase Korporat</h2>
-                <div class="grid-2">
-                    <div style="background: #111827; padding:15px; border-radius:8px; border: 1px solid var(--dark-gray);">
-                        <h3>Quest Analisis Riset</h3>
-                        <button class="btn btn-action" onclick="generateQuest()">Buka Riset Prospektus Baru</button>
-                        <div id="quest-container" style="margin-top:15px;"></div>
-                    </div>
-                    <div style="background: #111827; padding:15px; border-radius:8px; border: 1px solid var(--dark-gray);">
-                        <h3>⚡ Sabotase Pasar (Short Attack)</h3>
-                        <p style="font-size:12px; color:#cbd5e1;">Gunakan 30 Poin Analisis untuk menghancurkan harga emiten tertentu sebesar 20% lewat manipulasi berita.</p>
-                        <select id="spy-target-select" class="search-input" style="margin-bottom:10px;"></select>
-                        <button class="btn btn-sell" style="width:100%;" onclick="executeSabotage()">Luncurkan Serangan Informasi</button>
-                    </div>
-                </div>
-            </div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-slate-400">Age Progress</span>
+            <span class="font-mono text-slate-300">18 → 65</span>
+          </div>
+          <div class="progress-bar">
+            <div id="ageBar" class="progress-fill" style="width:0%;background:linear-gradient(90deg,#38bdf8,#a78bfa)"></div>
+          </div>
         </div>
+        <div class="pt-1 border-t border-slate-700">
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-slate-400">Career Level</span>
+            <span id="careerLevel" class="font-mono neon-blue text-xs">Junior Analyst</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-400">Health Ins.</span>
+            <span id="healthInsStatus" class="text-xs font-semibold text-red-400">✗ None</span>
+          </div>
+          <div class="flex justify-between text-sm mt-1">
+            <span class="text-slate-400">Market Sentiment</span>
+            <span id="marketSentiment" class="text-xs font-semibold">😐 Neutral</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
 
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 space-y-3 min-w-0">
+    
+    <!-- Tabs -->
+    <div class="glass-card">
+      <div class="flex border-b border-slate-800 px-4">
+        <button onclick="switchTab('markets')" id="tab-markets" class="tab-btn active py-3 px-4 text-sm font-medium text-slate-400 hover:text-white">📈 Markets</button>
+        <button onclick="switchTab('realestate')" id="tab-realestate" class="tab-btn py-3 px-4 text-sm font-medium text-slate-400 hover:text-white">🏠 Real Estate & Bank</button>
+        <button onclick="switchTab('career')" id="tab-career" class="tab-btn py-3 px-4 text-sm font-medium text-slate-400 hover:text-white">💼 Career & Insurance</button>
+      </div>
+      
+      <!-- TAB 1: MARKETS -->
+      <div id="content-markets" class="tab-content active p-4">
+        
+        <!-- Portfolio Summary -->
+        <div id="portfolioSummary" class="mb-4 p-3 rounded-lg bg-slate-900/50 border border-slate-800 hidden">
+          <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">Your Portfolio</h4>
+          <div id="portfolioList" class="space-y-1 text-sm"></div>
+        </div>
+        
+        <!-- Stock Market -->
+        <div class="mb-5">
+          <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+            <span>📊 Stock Market</span>
+            <span class="text-slate-700">—</span>
+            <span id="stockMarketNote" class="text-slate-600 normal-case font-normal tracking-normal">Equities</span>
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <!-- Index Fund -->
+            <div class="glass-card p-3" id="card-indexFund">
+              <div class="flex justify-between items-start mb-1">
+                <div>
+                  <div class="font-semibold text-sm text-white">Index Fund</div>
+                  <div class="text-xs text-slate-500">Low Risk · 7-10% annual</div>
+                </div>
+                <div class="text-right">
+                  <div id="price-indexFund" class="font-mono font-bold neon-green text-sm">$100.00</div>
+                  <div id="change-indexFund" class="text-xs font-mono">+0.00%</div>
+                </div>
+              </div>
+              <canvas id="chart-indexFund" width="220" height="40" class="w-full mb-2"></canvas>
+              <div class="text-xs text-slate-500 mb-2">Held: <span id="held-indexFund" class="text-slate-300 font-mono">0 shares</span> · Value: <span id="value-indexFund" class="text-slate-300 font-mono">$0</span></div>
+              <div class="flex gap-2">
+                <input type="number" id="buy-indexFund" placeholder="Shares to buy" min="1" class="flex-1 w-0" />
+                <button onclick="buyStock('indexFund')" class="btn-success text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer font-semibold">BUY</button>
+                <button onclick="sellStock('indexFund')" class="btn-danger text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer font-semibold">SELL</button>
+              </div>
+            </div>
+            
+            <!-- Tech Stock -->
+            <div class="glass-card p-3" id="card-techStock">
+              <div class="flex justify-between items-start mb-1">
+                <div>
+                  <div class="font-semibold text-sm text-white">Tech Stock</div>
+                  <div class="text-xs text-slate-500">High Risk · Volatile</div>
+                </div>
+                <div class="text-right">
+                  <div id="price-techStock" class="font-mono font-bold neon-green text-sm">$50.00</div>
+                  <div id="change-techStock" class="text-xs font-mono">+0.00%</div>
+                </div>
+              </div>
+              <canvas id="chart-techStock" width="220" height="40" class="w-full mb-2"></canvas>
+              <div class="text-xs text-slate-500 mb-2">Held: <span id="held-techStock" class="text-slate-300 font-mono">0 shares</span> · Value: <span id="value-techStock" class="text-slate-300 font-mono">$0</span></div>
+              <div class="flex gap-2">
+                <input type="number" id="buy-techStock" placeholder="Shares to buy" min="1" class="flex-1 w-0" />
+                <button onclick="buyStock('techStock')" class="btn-success text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer font-semibold">BUY</button>
+                <button onclick="sellStock('techStock')" class="btn-danger text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer font-semibold">SELL</button>
+              </div>
+            </div>
+            
+            <!-- Dividend Stock -->
+            <div class="glass-card p-3" id="card-divStock">
+              <div class="flex justify-between items-start mb-1">
+                <div>
+                  <div class="font-semibold text-sm text-white">Dividend Stock</div>
+                  <div class="text-xs text-slate-500">Stable · 4% + 1% div/qtr</div>
+                </div>
+                <div class="text-right">
+                  <div id="price-divStock" class="font-mono font-bold neon-green text-sm">$75.00</div>
+                  <div id="change-divStock" class="text-xs font-mono">+0.00%</div>
+                </div>
+              </div>
+              <canvas id="chart-divStock" width="220" height="40" class="w-full mb-2"></canvas>
+              <div class="text-xs text-slate-500 mb-2">Held: <span id="held-divStock" class="text-slate-300 font-mono">0 shares</span> · Value: <span id="value-divStock" class="text-slate-300 font-mono">$0</span></div>
+              <div class="flex gap-2">
+                <input type="number" id="buy-divStock" placeholder="Shares to buy" min="1" class="flex-1 w-0" />
+                <button onclick="buyStock('divStock')" class="btn-success text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer font-semibold">BUY</button>
+                <button onclick="sellStock('divStock')" class="btn-danger text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer font-semibold">SELL</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Crypto -->
         <div>
-            <button class="btn" style="background: var(--orange); width: 100%; padding: 15px; font-size: 14px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; color:#020617;" onclick="toggleLogModal(true)">
-                📜 LOG HISTORIS
-            </button>
-            <div class="panel">
-                <h2>Global News</h2>
-                <div id="quick-log-container"></div>
+          <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">₿ Crypto Assets</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- Bitcoin -->
+            <div class="glass-card p-3" id="card-bitcoin">
+              <div class="flex justify-between items-start mb-1">
+                <div>
+                  <div class="font-semibold text-sm text-white">BitCoin <span class="text-yellow-400">₿</span></div>
+                  <div class="text-xs text-slate-500">Extreme Volatility · Sentiment-driven</div>
+                </div>
+                <div class="text-right">
+                  <div id="price-bitcoin" class="font-mono font-bold neon-yellow text-sm">$30,000</div>
+                  <div id="change-bitcoin" class="text-xs font-mono">+0.00%</div>
+                </div>
+              </div>
+              <canvas id="chart-bitcoin" width="320" height="40" class="w-full mb-2"></canvas>
+              <div class="text-xs text-slate-500 mb-2">Held: <span id="held-bitcoin" class="text-slate-300 font-mono">0 BTC</span> · Value: <span id="value-bitcoin" class="text-slate-300 font-mono">$0</span></div>
+              <div class="flex gap-2">
+                <input type="number" id="buy-bitcoin" placeholder="BTC amount (decimals ok)" min="0.001" step="0.001" class="flex-1 w-0" />
+                <button onclick="buyStock('bitcoin')" class="btn-success text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer font-semibold">BUY</button>
+                <button onclick="sellStock('bitcoin')" class="btn-danger text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer font-semibold">SELL</button>
+              </div>
             </div>
-            <div class="panel" style="font-size:13px;">
-                <h2>Estimasi Neraca Bulanan</h2>
-                <p>Gaji Pokok: <span id="lbl-summary-salary" class="up">$0</span></p>
-                <p>Sewa Properti: <span id="lbl-summary-rent" class="up">$0</span></p>
-                <p>Dividen Korporasi: <span id="lbl-summary-div" class="up">$0</span></p>
+            <!-- HYSA Info -->
+            <div class="glass-card p-3 flex flex-col justify-between">
+              <div>
+                <div class="font-semibold text-sm text-white mb-1">🏦 High-Yield Savings</div>
+                <div class="text-xs text-slate-500 mb-3">4% APY, compounded monthly on your cash balance. Automatic — no action needed.</div>
+                <div class="space-y-2">
+                  <div class="flex justify-between text-sm"><span class="text-slate-400">Current Cash</span><span id="hysaCash" class="font-mono neon-green">$10,000</span></div>
+                  <div class="flex justify-between text-sm"><span class="text-slate-400">Monthly Interest</span><span id="hysaMonthlyInt" class="font-mono neon-blue">$33.33</span></div>
+                  <div class="flex justify-between text-sm"><span class="text-slate-400">Annual Rate</span><span class="font-mono text-slate-300">4.00%</span></div>
+                  <div class="flex justify-between text-sm"><span class="text-slate-400">Total Earned</span><span id="hysaTotalEarned" class="font-mono neon-blue">$0</span></div>
+                </div>
+              </div>
+              <div class="mt-3 p-2 rounded bg-blue-900/20 border border-blue-800/30 text-xs text-blue-300">
+                💡 Interest is auto-applied each turn to your cash balance.
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-
-    <div id="log-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>LOG INVESTASI JALUR PORTOFOLIO</h2>
-                <button class="btn btn-sell" onclick="toggleLogModal(false)">TUTUP</button>
-            </div>
-            <div class="log-box" id="log-target"></div>
+      </div>
+      
+      <!-- TAB 2: REAL ESTATE & BANK -->
+      <div id="content-realestate" class="tab-content p-4">
+        
+        <!-- Properties Owned -->
+        <div id="propertiesOwned" class="mb-5 hidden">
+          <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">🏘️ Your Properties</h4>
+          <div id="propertiesList" class="space-y-3"></div>
         </div>
-    </div>
-
-    <div id="chart-modal" class="modal-overlay hidden">
-        <div class="modal-content" id="chart-modal-content">
-            <div class="modal-header">
-                <h2 id="chart-modal-asset-title" style="margin:0; color:var(--green);">GRAFIK TREN HISTORIS</h2>
-                <button class="btn btn-sell" onclick="closeChartModal()">TUTUP</button>
+        
+        <!-- Buy Properties -->
+        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">🏗️ Property Market</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <!-- Residential -->
+          <div class="glass-card p-4">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <div class="font-bold text-white">Residential Property</div>
+                <div class="text-xs text-slate-500">Single family home</div>
+              </div>
+              <div id="resPrice" class="font-mono font-bold neon-blue text-sm">$200,000</div>
             </div>
-            <div class="chart-container-box">
-                <canvas id="big-trend-canvas" class="big-chart-canvas" width="540" height="240"></canvas>
+            <div class="space-y-1.5 text-sm mb-4">
+              <div class="flex justify-between"><span class="text-slate-400">Down Payment (20%)</span><span class="font-mono text-white" id="resDownPayment">$40,000</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Mortgage Amount</span><span class="font-mono text-red-400" id="resMortgage">$160,000</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Rental Income</span><span class="font-mono neon-green">$1,200/mo</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Maintenance/Taxes</span><span class="font-mono neon-red">-$400/mo</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Net Rental Profit</span><span class="font-mono neon-green">+$800/mo</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Min. Credit Score</span><span class="font-mono neon-yellow">650</span></div>
             </div>
+            <button onclick="buyProperty('residential')" class="btn-primary w-full text-white font-semibold py-2 rounded-lg cursor-pointer text-sm">Purchase Residential Property</button>
+          </div>
+          
+          <!-- Commercial -->
+          <div class="glass-card p-4">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <div class="font-bold text-white">Commercial Property</div>
+                <div class="text-xs text-slate-500">Office / Retail unit</div>
+              </div>
+              <div id="comPrice" class="font-mono font-bold neon-purple text-sm">$500,000</div>
+            </div>
+            <div class="space-y-1.5 text-sm mb-4">
+              <div class="flex justify-between"><span class="text-slate-400">Down Payment (25%)</span><span class="font-mono text-white" id="comDownPayment">$125,000</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Mortgage Amount</span><span class="font-mono text-red-400" id="comMortgage">$375,000</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Rental Income</span><span class="font-mono neon-green">$3,500/mo</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Maintenance/Taxes</span><span class="font-mono neon-red">-$1,000/mo</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Net Rental Profit</span><span class="font-mono neon-green">+$2,500/mo</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Min. Credit Score</span><span class="font-mono neon-yellow">720</span></div>
+            </div>
+            <button onclick="buyProperty('commercial')" class="btn-primary w-full text-white font-semibold py-2 rounded-lg cursor-pointer text-sm">Purchase Commercial Property</button>
+          </div>
         </div>
+        
+        <!-- Student Loan -->
+        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">🎓 Debt Management</h4>
+        <div class="glass-card p-4">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <div class="font-bold text-white mb-1">Student Loan</div>
+              <div class="text-xs text-slate-500">6% annual interest rate</div>
+            </div>
+            <div class="text-right">
+              <div id="loanBalance" class="font-mono font-bold neon-red text-lg">$30,000</div>
+              <div class="text-xs text-slate-500">remaining</div>
+            </div>
+          </div>
+          <div class="space-y-2 text-sm mb-4">
+            <div class="flex justify-between"><span class="text-slate-400">Monthly Minimum</span><span class="font-mono text-red-400">$300</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Monthly Interest</span><span id="loanMonthlyInt" class="font-mono text-red-400">$150.00</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Months to Payoff (min)</span><span id="loanPayoffMonths" class="font-mono text-slate-300">~200 months</span></div>
+            <div class="progress-bar mt-2">
+              <div id="loanProgress" class="progress-fill" style="width:0%;background:#f87171"></div>
+            </div>
+            <div class="text-xs text-slate-500 text-right">Paid: <span id="loanPaidPct">0%</span></div>
+          </div>
+          <div class="flex gap-3">
+            <input type="number" id="extraLoanPayment" placeholder="Extra payment amount" min="0" class="flex-1" />
+            <button onclick="makeExtraLoanPayment()" class="btn-warn text-white font-semibold px-4 py-2 rounded-lg cursor-pointer text-sm">Pay Extra</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- TAB 3: CAREER & INSURANCE -->
+      <div id="content-career" class="tab-content p-4">
+        
+        <!-- Career -->
+        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">💼 Career Progression</h4>
+        <div class="glass-card p-4 mb-4">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <div id="currentJobTitle" class="font-bold text-white text-lg">Junior Analyst</div>
+              <div class="text-xs text-slate-500">Current Position</div>
+            </div>
+            <div class="text-right">
+              <div id="currentSalary" class="font-mono font-bold neon-green text-lg">$3,500/mo</div>
+              <div class="text-xs text-slate-500">Monthly Salary</div>
+            </div>
+          </div>
+          <div id="careerProgress" class="space-y-3"></div>
+        </div>
+        
+        <!-- Insurance -->
+        <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">🛡️ Insurance</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Health Insurance -->
+          <div class="glass-card p-4">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <div class="font-bold text-white">Health Insurance</div>
+                <div class="text-xs text-slate-500">Protects against medical emergencies</div>
+              </div>
+              <div id="healthInsIcon" class="text-2xl">🚑</div>
+            </div>
+            <div class="space-y-1.5 text-sm mb-4">
+              <div class="flex justify-between"><span class="text-slate-400">Monthly Premium</span><span class="font-mono text-white">$150/mo</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Medical Emergency Cost</span><span class="font-mono neon-green">$500 (vs $5,000)</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Status</span><span id="healthInsStatusCard" class="font-semibold text-red-400">✗ Not Covered</span></div>
+            </div>
+            <button onclick="toggleInsurance('health')" id="healthInsBtn" class="btn-primary w-full text-white font-semibold py-2 rounded-lg cursor-pointer text-sm">Buy Health Insurance ($150/mo)</button>
+          </div>
+          
+          <!-- Property Insurance -->
+          <div class="glass-card p-4">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <div class="font-bold text-white">Property Insurance</div>
+                <div class="text-xs text-slate-500">Covers property damage events</div>
+              </div>
+              <div class="text-2xl">🏠</div>
+            </div>
+            <div class="space-y-1.5 text-sm mb-4">
+              <div class="flex justify-between"><span class="text-slate-400">Monthly Premium</span><span class="font-mono text-white">$200/mo</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Covers</span><span class="font-mono neon-green text-xs">Damage events (-50%)</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Status</span><span id="propInsStatusCard" class="font-semibold text-red-400">✗ Not Covered</span></div>
+            </div>
+            <button onclick="toggleInsurance('property')" id="propInsBtn" class="btn-primary w-full text-white font-semibold py-2 rounded-lg cursor-pointer text-sm">Buy Property Insurance ($200/mo)</button>
+          </div>
+        </div>
+        
+        <!-- Side Hustles -->
+        <div class="mt-4">
+          <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">⚡ Side Hustles</h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="glass-card p-3">
+              <div class="font-semibold text-sm text-white mb-1">Freelancing</div>
+              <div class="text-xs text-slate-500 mb-2">+$500/mo but costs 10 hours/week</div>
+              <div class="flex justify-between text-sm mb-3"><span class="text-slate-400">Status</span><span id="freelanceStatus" class="text-red-400 font-semibold text-xs">Inactive</span></div>
+              <button onclick="toggleSideHustle('freelance')" id="freelanceBtn" class="btn-primary w-full text-white text-xs py-1.5 rounded-lg cursor-pointer font-semibold">Start Freelancing</button>
+            </div>
+            <div class="glass-card p-3">
+              <div class="font-semibold text-sm text-white mb-1">Content Creation</div>
+              <div class="text-xs text-slate-500 mb-2">+$200/mo growing, passive after 6 months</div>
+              <div class="flex justify-between text-sm mb-3"><span class="text-slate-400">Status</span><span id="contentStatus" class="text-red-400 font-semibold text-xs">Inactive</span></div>
+              <button onclick="toggleSideHustle('content')" id="contentBtn" class="btn-primary w-full text-white text-xs py-1.5 rounded-lg cursor-pointer font-semibold">Start Content Creation</button>
+            </div>
+            <div class="glass-card p-3">
+              <div class="font-semibold text-sm text-white mb-1">Online Business</div>
+              <div class="text-xs text-slate-500 mb-2">Costs $2,000 to start. +$800/mo potential</div>
+              <div class="flex justify-between text-sm mb-3"><span class="text-slate-400">Status</span><span id="bizStatus" class="text-red-400 font-semibold text-xs">Inactive</span></div>
+              <button onclick="toggleSideHustle('business')" id="bizBtn" class="btn-primary w-full text-white text-xs py-1.5 rounded-lg cursor-pointer font-semibold">Start Business ($2,000)</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <script>
-        // ====== STATE ENGINE GAME ======
-        let game = {
-            cash: 10000.00, debt: 0.00, year: 1990, month: 1, day: 1,
-            jobName: "Unemployed", salary: 0, analysisScore: 0, networkScore: 0,
-            logs: [], bonds: [], autoCompounding: false, sanctionActive: false,
-
-            macroCycle: "Recovery",
-            interestRate: 0.06,      
-            inflation: 0.02,         
-            m2MoneySupply: 1000000,  
-            marketSentiment: 50,     
-            minskyStabilityDays: 0,  
-            leverageFactor: 1.0,
-
-            // STATE OBJEK OPERASIONAL PERUSAHAAN MANDIRI BARU & FITUR LANJUTAN
-            myCompany: {
-                established: false,
-                name: "",
-                type: "Konsumer",
-                level: 1,
-                employees: 0,
-                efficiency: 0.50,
-                marketing: 5,
-                rawMaterials: 0,
-                goods: 0,
-                distributors: 1,
-                blackMarketDistributors: 0,
-                // TEROBOSAN TERINTEGRASI:
-                wageTier: "Standard",
-                strikeActive: false,
-                productTier: 1,
-                issuedBonds: [],
-                vipMonopoly: false,
-                vipShadow: false
-            }
-        };
-
-        const productNames = {
-            "Konsumer": ["Makanan Kaleng", "Minuman Bersoda", "Kosmetik Massal"],
-            "Teknologi": ["Radio Tabung", "Pager 90an", "Komputer Komparator 386"],
-            "Energi": ["Briket Batu Bara", "Minyak Fraksi", "Bio-Fuel Sintetis"]
-        };
-
-        let tutorialStep = 0; 
-        let currentQuest = null;
-        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-
-        const assets = [
-            { id: "AAPL", name: "Apple Computer Inc.", price: 1.20, type: "Teknologi", pe: 12.0, basePe: 12.0, volatility: 0.035, owned: 0, history: Array(30).fill(1.20) },
-            { id: "MSFT", name: "Microsoft Corporation", price: 0.80, type: "Teknologi", pe: 15.0, basePe: 15.0, volatility: 0.04, owned: 0, history: Array(30).fill(0.80) },
-            { id: "IBM", name: "IBM Blue Chip Giant", price: 22.00, type: "Teknologi", pe: 10.5, basePe: 10.5, volatility: 0.015, owned: 0, history: Array(30).fill(22.00) },
-            { id: "INTC", name: "Intel Semiconductors", price: 1.50, type: "Teknologi", pe: 11.2, basePe: 11.2, volatility: 0.03, owned: 0, history: Array(30).fill(1.50) },
-            { id: "HPQ", name: "Hewlett-Packard Co.", price: 3.50, type: "Teknologi", pe: 10.0, basePe: 10.0, volatility: 0.02, owned: 0, history: Array(30).fill(3.50) },
-            { id: "CSCO", name: "Cisco Systems Network", price: 0.10, type: "Teknologi", pe: 18.0, basePe: 18.0, volatility: 0.05, owned: 0, history: Array(30).fill(0.10) },
-            { id: "XOM", name: "Exxon Mobil Corp.", price: 11.50, type: "Energi", pe: 8.5, basePe: 8.5, volatility: 0.015, owned: 0, history: Array(30).fill(11.50) },
-            { id: "CVX", name: "Chevron Corporation", price: 13.20, type: "Energi", pe: 9.0, basePe: 9.0, volatility: 0.018, owned: 0, history: Array(30).fill(13.20) },
-            { id: "JPM", name: "JP Morgan Chase Bank", price: 4.50, type: "Finansial", pe: 9.5, basePe: 9.5, volatility: 0.018, owned: 0, history: Array(30).fill(4.50) },
-            { id: "GS", name: "Goldman Sachs Group", price: 18.00, type: "Finansial", pe: 11.0, basePe: 11.0, volatility: 0.025, owned: 0, history: Array(30).fill(18.00) },
-            { id: "KO", name: "Coca-Cola Corporation", price: 4.20, type: "Konsumer", pe: 16.5, basePe: 16.5, volatility: 0.012, owned: 0, history: Array(30).fill(4.20) },
-            { id: "WMT", name: "Walmart Discount Stores", price: 2.90, type: "Konsumer", pe: 17.0, basePe: 17.0, volatility: 0.015, owned: 0, history: Array(30).fill(2.90) },
-            { id: "GOLD", name: "Emas Komoditas Spot", price: 380.0, type: "Komoditas", pe: null, volatility: 0.008, owned: 0, history: Array(30).fill(380.0) },
-            { id: "OIL", name: "Minyak Mentah Brent", price: 20.0, type: "Komoditas", pe: null, volatility: 0.028, owned: 0, history: Array(30).fill(20.0) }
-        ];
-
-        const shadowAssets = [
-            { id: "SHDW_CHIP", name: "Sirkuit Mikro Selundupan Blok-E", price: 180.00, risk: 0.12, owned: 0 },
-            { id: "SHDW_DOC", name: "Cetak Biru Korporat Lapisan Rahasia", price: 1200.00, risk: 0.22, owned: 0 },
-            { id: "SHDW_URAN", name: "Uranium Batangan Akses Kilang", price: 5500.00, risk: 0.35, owned: 0 },
-            { id: "SHDW_ART", name: "Masterpiece Lukisan Klasik Curian", price: 15000.00, risk: 0.18, owned: 0 },
-            { id: "SHDW_WEAP", name: "Prototipe Senjata Balistik Militer", price: 22000.00, risk: 0.40, owned: 0 },
-            { id: "SHDW_DIAM", name: "Berlian Mentah Selundupan Afrika", price: 8500.00, risk: 0.15, owned: 0 },
-            { id: "SHDW_GOLD", name: "Emas Batangan Tanpa Seri Registrasi", price: 4200.00, risk: 0.08, owned: 0 },
-            { id: "SHDW_DECR", name: "Kunci Dekripsi Server Keuangan Swiss", price: 31000.00, risk: 0.45, owned: 0 },
-            { id: "SHDW_OIL", name: "Barel Minyak Selundupan Pasar Gelap", price: 1100.00, risk: 0.20, owned: 0 },
-            { id: "SHDW_SAT", name: "Modul Transponder Satelit Militer", price: 65000.00, risk: 0.50, owned: 0 }
-        ];
-
-        const properties = [
-            { id: "prop1", name: "Ruko Sub-Urban Kelontong", price: 20000, rent: 180, owned: 0 },
-            { id: "prop2", name: "Apartemen Pusat Kota Loft", price: 85000, rent: 750, owned: 0 },
-            { id: "prop3", name: "Gudang Logistik Dermaga Pelabuhan", price: 150000, rent: 1400, owned: 0 },
-            { id: "prop4", name: "Ruko Komersial Sektor Barat", price: 240000, rent: 2300, owned: 0 },
-            { id: "prop5", name: "Vila Mewah Lereng Pegunungan Aspen", price: 520000, rent: 5100, owned: 0 },
-            { id: "prop6", name: "Plaza Perbelanjaan Distrik Pusat", price: 1200000, rent: 13500, owned: 0 },
-            { id: "prop7", name: "Kompleks Kondominium High-Rise", price: 3400000, rent: 41000, owned: 0 },
-            { id: "prop8", name: "Resort Eksklusif Pulau Privat", price: 7500000, rent: 92000, owned: 0 },
-            { id: "prop9", name: "Lahan Agro-Industri Kelapa Sawit", price: 15000000, rent: 210000, owned: 0 },
-            { id: "prop10", name: "Menara Kantor Tunggal Wall Street", price: 45000000, rent: 680000, owned: 0 }
-        ];
-
-        const corporates = [
-            { id: "corp1", name: "Mega Logistic Cargo Holding", price: 180000, dividend: 2500, owned: false },
-            { id: "corp2", name: "Pacific Steel Industry", price: 450000, dividend: 7000, owned: false },
-            { id: "corp3", name: "Omni Consumer Cybernetics Group", price: 950000, dividend: 16000, owned: false },
-            { id: "corp4", name: "Apex Pharmaceutical Global", price: 2100000, dividend: 38000, owned: false },
-            { id: "corp5", name: "Universal Sat-Telecom Network", price: 4800000, dividend: 95000, owned: false },
-            { id: "corp6", name: "United Energy Power Grid Inc.", price: 11000000, dividend: 240000, owned: false },
-            { id: "corp7", name: "Standard Petrochemical Multinasional", price: 28000000, dividend: 650000, owned: false },
-            { id: "corp8", name: "Trans-Continental Railroad Corp", price: 62000000, dividend: 1500000, owned: false },
-            { id: "corp9", name: "Horizon Aero-Space Industries", price: 140000000, dividend: 3800000, owned: false },
-            { id: "corp10", name: "Dynasty Broadcasting Media Group", price: 350000000, dividend: 11000000, owned: false }
-        ];
-
-        const networkVIP = [
-            { id: "net1", name: "Makan Dinner Bersama Manajer Kredit", cost: 1500, rewards: "credit1", desc: "Membuka plafon pinjaman kredit bank hingga $25,000" },
-            { id: "net2", name: "Lobi Kebijakan Sanksi Sektor Teknologi", cost: 12000, rewards: "sanction", desc: "Sektor teknologi turun 15%, komoditas melesat naik 40%" },
-            { id: "net3", name: "Suap Internal Kepala Otoritas Pajak", cost: 8500, rewards: "tax_shield", desc: "Mendapatkan perlindungan audit pasar gelap selama 100 hari" },
-            { id: "net4", name: "Pertemuan Rahasia Anggota Senator Distrik", cost: 25000, rewards: "credit2", desc: "Plafon pinjaman naik ekstrim hingga batas $250,000" },
-            { id: "net5", name: "Akses Eksklusif Broker Utama Wall Street", cost: 45000, rewards: "fee_cut", desc: "Memangkas volatilitas emiten teknologi sebesar 1% stabil" },
-            { id: "net6", name: "Koneksi Agen Spionase Industri Pusat", cost: 90000, rewards: "spy_intel", desc: "Mendapatkan bonus +50 Poin Analisis secara instan" },
-            { id: "net7", name: "Sponsor Pendanaan Kampanye Gubernur", cost: 180000, rewards: "prop_tax", desc: "Menerima potongan biaya pembelian real estate sebesar 10%" },
-            { id: "net8", name: "Bisikan Kartel Minyak Internasional", cost: 400000, rewards: "oil_pump", desc: "Seketika mendongkrak harga komoditas OIL sebesar 30%" },
-            { id: "net9", name: "Simposium Tertutup Komite Sentral Bank", cost: 1200000, rewards: "interest_drop", desc: "Menurunkan bunga berjalan utang harian sebesar setengahnya" },
-            { id: "net10", name: "Akuisisi Syndikasi Kantor Berita Utama", cost: 5000000, rewards: "media_monopoly", desc: "Poin biaya meluncurkan Sabotase Pasar berkurang menjadi 10 Pts" },
-            // TAMBAHAN VIP TEROBOSAN
-            { id: "net11", name: "Lobi Panglima Fraksi Militer", cost: 150000, rewards: "corp_shadow", desc: "Distribusi Pasar Gelap PT Anda kebal 100% dari razia selamanya." },
-            { id: "net12", name: "Kartel Ekspor Impor Global", cost: 250000, rewards: "corp_monopoly", desc: "Harga beli bahan baku PT Anda dipangkas permanen dari $40 ke $18." }
-        ];
-
-        const jobs = [
-            { id: "1", name: "Magang Data Entry", salary: 800, reqAna: 0, reqNet: 0 },
-            { id: "2", name: "Analis Kredit Muda", salary: 2200, reqAna: 15, reqNet: 5 },
-            { id: "3", name: "Manajer Aset Portofolio", salary: 6500, reqAna: 50, reqNet: 20 },
-            { id: "4", name: "Kepala Auditor Keuangan Regional", salary: 14000, reqAna: 100, reqNet: 45 },
-            { id: "5", name: "Konsultan Strategi Makro Korporat", salary: 28000, reqAna: 180, reqNet: 90 },
-            { id: "6", name: "Direktur Pelaksana Investasi Bank", salary: 60000, reqAna: 300, reqNet: 160 },
-            { id: "7", name: "Wakil Presiden Direktur Capital Ventura", salary: 110000, reqAna: 450, reqNet: 250 },
-            { id: "8", name: "Chief Executive Officer (CEO) Holding", salary: 250000, reqAna: 700, reqNet: 400 },
-            { id: "9", name: "Penasihat Finansial Utama Kepresidenan", salary: 550000, reqAna: 1100, reqNet: 650 },
-            { id: "10", name: "Gubernur Bank Sentral Koordinator", salary: 1200000, reqAna: 1800, reqNet: 1100 }
-        ];
-
-        function showToast(msg, type = "success") {
-            let container = document.getElementById("toast-container");
-            let t = document.createElement("div"); t.className = "toast";
-            t.style.backgroundColor = type === "success" ? "var(--green)" : "var(--red)";
-            t.innerText = msg; container.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        }
-
-        function toggleAutoCompounding() {
-            game.autoCompounding = !game.autoCompounding;
-            document.getElementById("compounding-switch").classList.toggle("active", game.autoCompounding);
-            showToast(game.autoCompounding ? "Auto-Compounding Aktif" : "Auto-Compounding Nonaktif");
-        }
-
-        let maxCreditLimit = 5000;
-        let taxShieldDays = 0;
-        let sabotageCost = 30;
-
-        function runMacroEconomicEngine() {
-            if (typeof assets === 'undefined' || assets.length === 0) return;
-
-            let targetRate = 0.06;
-            if (game.marketSentiment > 75) {
-                targetRate = 0.15; 
-                game.m2MoneySupply *= 0.985; 
-            } else if (game.marketSentiment < 30) {
-                targetRate = 0.02; 
-                game.m2MoneySupply *= 1.02;  
-            }
-            game.interestRate += (targetRate - game.interestRate) * 0.15;
-            game.inflation = 0.01 + (game.marketSentiment / 5000) + (game.m2MoneySupply / 50000000);
-
-            let upwardAssets = assets.filter(a => a.history && a.history.length >= 2 && a.price > a.history[a.history.length - 2]).length;
-            let isMarketRallying = upwardAssets >= (assets.length / 2);
-
-            if (isMarketRallying) {
-                game.minskyStabilityDays++;
-                game.marketSentiment += 1.2;
-                game.leverageFactor += 0.05; 
-            } else {
-                game.minskyStabilityDays = Math.max(0, game.minskyStabilityDays - 1);
-                game.marketSentiment -= 1.5;
-                game.leverageFactor = Math.max(1.0, game.leverageFactor - 0.08);
-            }
-            game.marketSentiment = Math.max(5, Math.min(100, game.marketSentiment));
-
-            let minskyMomentTriggered = false;
-            if (game.marketSentiment > 78) {
-                let crashProbability = (game.minskyStabilityDays / 180) * (game.leverageFactor / 2);
-                if (Math.random() < crashProbability) minskyMomentTriggered = true;
-            }
-
-            if (minskyMomentTriggered) {
-                game.marketSentiment = 8;
-                game.minskyStabilityDays = 0;
-                game.leverageFactor = 0.8;
-                game.macroCycle = "Depression";
-                addLog("🚨 MINSKY MOMENT", "GELEMBUNG BURSA PECAH PEKAT! Terjadi likuidasi utang paksa massal di pasar global.", "error");
-                showToast("CRASH TOTAL BURSA GLOBAL!", "error");
-            }
-
-            assets.forEach(a => {
-                let capitalAttraction = 1.0;
-                let originalVIPFactor = game.sanctionActive ? (a.type === "Teknologi" ? 0.98 : 1.02) : 1;
-
-                if (minskyMomentTriggered) {
-                    capitalAttraction = a.type === "Teknologi" ? 0.15 : 0.40;
-                    if (a.type === "Komoditas") capitalAttraction = 0.85; 
-                } else {
-                    if (a.type === "Teknologi") capitalAttraction -= (game.interestRate - 0.06) * 4.5;
-                    else if (a.type === "Finansial") capitalAttraction += (game.interestRate - 0.06) * 2.0;
-
-                    if (game.marketSentiment > 65) {
-                        capitalAttraction *= (game.marketSentiment / 50) * (a.type === "Teknologi" ? 1.8 : 1.1);
-                    } else if (game.marketSentiment < 40) {
-                        if (a.type === "Komoditas" || a.type === "Konsumer") {
-                            capitalAttraction += (50 - game.marketSentiment) * 0.03; 
-                        } else {
-                            capitalAttraction *= (game.marketSentiment / 50);
-                        }
-                    }
-
-                    if (a.type === "Teknologi" && Math.random() < 0.04) {
-                        let shock = Math.random() > 0.4 ? 1.4 : 0.6;
-                        capitalAttraction *= shock;
-                        if (shock > 1) {
-                            addLog("⚡ SCHUMPETER SHOCK", `Inovasi teknologi mendadak memicu migrasi likuiditas ke emiten ${a.id}`);
-                        }
-                    }
-                }
-
-                capitalAttraction = Math.max(0.05, capitalAttraction);
-                let baselineVolatility = a.type === "Teknologi" ? a.volatility * 1.5 : a.volatility;
-                let moneySupplyEffect = (game.m2MoneySupply / 1000000);
-
-                let randomFactor = (Math.random() - 0.5) * 2 * baselineVolatility * game.leverageFactor;
-                let priceChangePercentage = ((capitalAttraction - 1.0) * 0.04) + randomFactor + (moneySupplyEffect * 0.005 - 0.005);
-
-                a.price = Math.max(0.1, a.price * (1 + priceChangePercentage) * originalVIPFactor);
-
-                if (!a.history) a.history = [];
-                a.history.push(a.price);
-                if (a.history.length > 30) a.history.shift();
-            });
-
-            if (game.marketSentiment >= 70) game.macroCycle = "Boom 🚀";
-            else if (game.marketSentiment >= 45 && game.marketSentiment < 70) game.macroCycle = "Recovery 📈";
-            else if (game.marketSentiment >= 25 && game.marketSentiment < 45) game.macroCycle = "Recession 📉";
-            else game.macroCycle = "Depression 💀";
-        }
-
-        function nextDay() {
-            let maxDays = new Date(game.year, game.month, 0).getDate();
-            game.day++;
-
-            if (taxShieldDays > 0) taxShieldDays--;
-
-            if (game.day > maxDays) {
-                game.day = 1; game.month++;
-                if (game.month > 12) { game.month = 1; game.year++; }
-                
-                let rentIncome = properties.reduce((acc, p) => acc + (p.rent * p.owned), 0);
-                let divIncome = corporates.reduce((acc, c) => acc + (c.owned ? c.dividend : 0), 0);
-                let totalInflow = game.salary + rentIncome + divIncome;
-
-                if (game.myCompany && game.myCompany.established) {
-                    let wagePerEmp = game.myCompany.wageTier === "Premium" ? 2500 : (game.myCompany.wageTier === "Standard" ? 1500 : 800);
-                    let employeeWages = game.myCompany.employees * wagePerEmp;
-                    let overheadMaintenance = game.myCompany.level * 4000;
-                    
-                    let sirkelDiscount = Math.min(employeeWages * 0.3, game.networkScore * 25);
-                    let finalCorporateCost = Math.max(1000, (employeeWages + overheadMaintenance) - sirkelDiscount);
-                    
-                    game.cash -= finalCorporateCost;
-                    addLog("PERUSAHAAN", `Beban operasional & gaji buruh PT bulanan dipotong sebesar ${formatUSD(finalCorporateCost)}`, "error");
-                }
-
-                if(game.autoCompounding) {
-                    game.bonds.push({ amount: totalInflow, days: 30 });
-                    showToast(`Inflow $${totalInflow} dialihkan otomatis ke Obligasi Bank!`);
-                } else {
-                    game.cash += totalInflow;
-                }
-            }
-
-            runMacroEconomicEngine();
-
-            if (game.myCompany && game.myCompany.established) {
-                let comp = game.myCompany;
-                
-                // Strike Engine Logic Check (Harian)
-                if (comp.wageTier === "Minimum" && game.inflation > 0.04) {
-                    if (Math.random() < 0.03 && !comp.strikeActive) { 
-                        comp.strikeActive = true;
-                        addLog("HRD", "MOGOK KERJA MASSAL! Inflasi tinggi menekan daya beli buruh. Efisiensi PT lumpuh!", "error");
-                        showToast("BURUH PT MOGOK KERJA!", "error");
-                    }
-                }
-                
-                // Pembayaran Bunga Obligasi PT Harian
-                let totalDailyBondInterest = 0;
-                for(let i = comp.issuedBonds.length - 1; i >= 0; i--) {
-                    let b = comp.issuedBonds[i];
-                    let dailyInterest = (b.amount * 0.08) / 30; // Beban bunga 8% per bulan
-                    totalDailyBondInterest += dailyInterest;
-                    b.days--;
-                    if (b.days <= 0) {
-                        game.cash -= b.amount;
-                        addLog("KORPORASI", `Obligasi PT senilai ${formatUSD(b.amount)} jatuh tempo dan pokok dilunasi otomatis.`);
-                        comp.issuedBonds.splice(i, 1);
-                        showToast("Obligasi PT Jatuh Tempo & Dilunasi");
-                    }
-                }
-                game.cash -= totalDailyBondInterest;
-
-                // Fase Pemrosesan
-                if (comp.employees > 0 && comp.rawMaterials > 0) {
-                    let baseCapacity = comp.employees * 3 * comp.level;
-                    let actualProcessed = Math.min(baseCapacity, comp.rawMaterials);
-                    
-                    let effMod = 1.0;
-                    if (comp.strikeActive) effMod = 0.0;
-                    else if (comp.wageTier === "Premium") effMod = 1.3;
-                    else if (comp.wageTier === "Minimum") effMod = 0.7;
-
-                    let standardOutput = Math.floor(actualProcessed * comp.efficiency * effMod);
-                    
-                    comp.rawMaterials -= actualProcessed;
-                    comp.goods += standardOutput;
-                }
-
-                // Fase Distribusi Penjualan
-                if (comp.goods > 0) {
-                    let sirkelBonusDemand = 1 + (game.networkScore / 100); 
-                    let marketDemandVolume = Math.floor((comp.marketing * (game.marketSentiment / 40)) * sirkelBonusDemand);
-                    
-                    let legalSalesCap = comp.distributors * 8;
-                    let blackMarketSalesCap = comp.blackMarketDistributors * 24; 
-                    let maxDistributionCap = legalSalesCap + blackMarketSalesCap;
-                    
-                    let totalUnitsSold = Math.min(comp.goods, marketDemandVolume, maxDistributionCap);
-                    
-                    if (totalUnitsSold > 0) {
-                        let tierMultiplier = comp.productTier === 1 ? 1 : (comp.productTier === 2 ? 1.8 : 2.8);
-                        let baseRetailPrice = (comp.type === "Teknologi" ? 160 : (comp.type === "Energi" ? 220 : 95)) * tierMultiplier;
-                        let finalRetailPrice = baseRetailPrice * (1 + game.inflation);
-                        
-                        let bmUnitsSold = Math.min(totalUnitsSold, blackMarketSalesCap);
-                        let legalUnitsSold = totalUnitsSold - bmUnitsSold;
-                        
-                        let revenueLegal = legalUnitsSold * finalRetailPrice;
-                        let revenueBlack = bmUnitsSold * finalRetailPrice * 1.45;
-                        let totalCorporateRevenue = revenueLegal + revenueBlack;
-                        
-                        comp.goods -= totalUnitsSold;
-                        game.cash += totalCorporateRevenue;
-                        
-                        if(Math.random() < 0.15) {
-                            addLog("PERUSAHAAN", `PT berhasil menjual ${totalUnitsSold} unit produk generasi ${comp.productTier} dengan omzet ${formatUSD(totalCorporateRevenue)}`);
-                        }
-                    }
-                }
-
-                // Resiko Razia Pasar Gelap Perusahaan (Dibatalkan oleh VIP Shadow)
-                if (comp.blackMarketDistributors > 0 && taxShieldDays === 0 && !comp.vipShadow) {
-                    let detectionChance = comp.blackMarketDistributors * 0.025;
-                    if (Math.random() < detectionChance) {
-                        let finePenalty = 120000;
-                        game.cash -= finePenalty;
-                        comp.blackMarketDistributors = Math.max(0, comp.blackMarketDistributors - 1);
-                        addLog("OTORITAS", `Audit investigatif PT! Distribusi ilegal disita, denda korporasi ${formatUSD(finePenalty)}`, "error");
-                        showToast("Perusahaan terkena sanksi audit!", "error");
-                    }
-                }
-            }
-
-            if(Math.random() < 0.04 && taxShieldDays === 0) {
-                let lost = false;
-                shadowAssets.forEach(s => {
-                    if(s.owned > 0 && Math.random() < s.risk) { s.owned = 0; lost = true; }
-                });
-                if(lost) {
-                    addLog("OTORITAS", "Razia besar-besaran! Sebagian aset pasar gelap disita karena melanggar regulasi bursa.", "error");
-                    showToast("Terjadi razia pasar gelap!", "error");
-                }
-            }
-
-            game.bonds.forEach((b, i) => {
-                b.days--;
-                if(b.days <= 0) { game.cash += b.amount * 1.05; game.bonds.splice(i, 1); showToast("Obligasi Bank matang (+5% Bunga)!"); }
-            });
-
-            if (game.debt > 0) {
-                game.debt *= (1 + (game.interestRate / 365));
-            }
-
-            updateUI();
-            if(tutorialStep === 3) { nextTutorialStep(); }
-        }
-
-        // ====== FUNGSI PERUSAHAAN (UPDATED DENGAN TEROBOSAN) ======
-        function establishMyCompany() {
-            let nameInput = document.getElementById("mycorp-input-name").value.trim();
-            let selectedType = document.getElementById("mycorp-select-type").value;
-            let establishmentCost = 650000;
-
-            if(!nameInput) { showToast("Masukkan nama perusahaan terlebih dahulu!", "error"); return; }
-            if(game.cash < establishmentCost) { showToast("Kapital kas Anda tidak mencukupi!", "error"); return; }
-
-            game.cash -= establishmentCost;
-            game.myCompany.established = true;
-            game.myCompany.name = nameInput;
-            game.myCompany.type = selectedType;
-            game.myCompany.employees = 2; 
-            
-            addLog("KORPORASI", `Resmi mendirikan badan usaha berbadan hukum: PT. ${nameInput} di sektor ${selectedType}`);
-            showToast("PT Anda Berhasil Didirikan!");
-            document.getElementById("mycorp-select-wage").value = "Standard";
-            updateUI();
-        }
-
-        function buyCompanyMaterials() {
-            let comp = game.myCompany;
-            let pricePerUnit = comp.vipMonopoly ? 18 : 40;
-            let priceBatch = pricePerUnit * 50;
-            
-            if(game.cash < priceBatch) { showToast("Kas Anda kurang untuk pengadaan logistik!", "error"); return; }
-            game.cash -= priceBatch;
-            comp.rawMaterials += 50;
-            showToast(`Pasokan +50 Unit Bahan Baku Masuk (${formatUSD(priceBatch)})`);
-            updateUI();
-        }
-
-        function changeWagePolicy() {
-            let p = document.getElementById("mycorp-select-wage").value;
-            game.myCompany.wageTier = p;
-            if (p !== "Minimum" && game.myCompany.strikeActive) {
-                game.myCompany.strikeActive = false;
-                showToast("Pemogokan berakhir! Buruh kembali bekerja.");
-                addLog("HRD", "Kebijakan upah diperbaiki. Buruh menghentikan mogok kerja massal.");
-            }
-            updateUI();
-        }
-
-        function upgradeProductTier() {
-            let comp = game.myCompany;
-            if (comp.productTier >= 3) { showToast("Tier evolusi produk sudah maksimal!", "error"); return; }
-            
-            let cost = 50000 * comp.productTier;
-            let pts = 30 * comp.productTier;
-            
-            if(game.cash < cost || game.analysisScore < pts) { showToast(`Syarat Riset Generasi Baru: ${formatUSD(cost)} & ${pts} Pts Analisis!`, "error"); return; }
-            
-            game.cash -= cost;
-            game.analysisScore -= pts;
-            comp.productTier++;
-            
-            addLog("R&D", `Evolusi lini produk PT mencapai Generasi Tier ${comp.productTier}`);
-            showToast("Produk Generasi Baru Ditemukan!");
-            updateUI();
-        }
-
-        function issueCorporateBond() {
-            let comp = game.myCompany;
-            let val = Math.floor(document.getElementById("mycorp-input-bond").value);
-            let limit = comp.level * 100000;
-            let currentBonds = comp.issuedBonds.reduce((a, b) => a + b.amount, 0);
-
-            if (isNaN(val) || val <= 0) return;
-            if (currentBonds + val > limit) { showToast(`Limit maksimal obligasi PT adalah ${formatUSD(limit)}`, "error"); return; }
-
-            game.cash += val;
-            comp.issuedBonds.push({ amount: val, days: 60 });
-            addLog("KORPORASI", `PT menerbitkan obligasi sebesar ${formatUSD(val)} ke pasar publik.`);
-            showToast("Obligasi PT Berhasil Diterbitkan!");
-            updateUI();
-            document.getElementById("mycorp-input-bond").value = "";
-        }
-
-        function hireCompanyEmployee() {
-            let hireCost = 3000;
-            if(game.cash < hireCost) { showToast("Kas kurang untuk memproses kontrak rekrutmen!", "error"); return; }
-            game.cash -= hireCost;
-            game.myCompany.employees++;
-            showToast("Karyawan Baru Berhasil Dikontrak");
-            updateUI();
-        }
-
-        function upgradeCompanyEfficiency() {
-            let upMoney = 35000;
-            let upPoints = 10;
-            if(game.cash < upMoney || game.analysisScore < upPoints) { showToast("Syarat pendanaan keuangan atau poin analisis riset belum memadai!", "error"); return; }
-            
-            game.cash -= upMoney;
-            game.analysisScore -= upPoints;
-            game.myCompany.efficiency = Math.min(0.98, game.myCompany.efficiency + 0.08);
-            game.myCompany.level++;
-            
-            showToast("Teknologi Manufaktur PT Berhasil Diupgrade!");
-            updateUI();
-        }
-
-        function boostCompanyMarketing() {
-            let adCost = 5000;
-            if(game.cash < adCost) { showToast("Kas tidak mencukupi untuk membeli slot iklan media!", "error"); return; }
-            game.cash -= adCost;
-            game.myCompany.marketing += 15;
-            showToast("Kampanye Iklan Berhasil Diluncurkan");
-            updateUI();
-        }
-
-        function expandLegalDistributor() {
-            let distCost = 20000;
-            if(game.cash < distCost) { showToast("Kas kurang untuk negosiasi kontrak!", "error"); return; }
-            game.cash -= distCost;
-            game.myCompany.distributors++;
-            showToast("Membuka 1 Jalur Agen Distribusi Resmi");
-            updateUI();
-        }
-
-        function hireBlackMarketDistributor() {
-            let costBribe = 45000;
-            let minSirkel = 30;
-            if(game.cash < costBribe) { showToast("Kas kurang untuk membayar uang muka konsesi mafia pelabuhan!", "error"); return; }
-            if(game.networkScore < minSirkel) { showToast("Sirkel relasi VIP Anda terlalu lemah untuk menjangkau broker bayangan!", "error"); return; }
-            
-            game.cash -= costBribe;
-            game.myCompany.blackMarketDistributors++;
-            addLog("PASAR GELAP", "PT Anda menyewa jaringan distributor selundupan bawah tanah untuk memotong jalur pasokan.");
-            showToast("Distributor Pasar Gelap Aktif!");
-            updateUI();
-        }
-
-        // ====== SYSTEM BURSA & VIP ======
-        function tradeAsset(index, isBuy) {
-            let asset = assets[index];
-            let qty = Math.floor(parseFloat(document.getElementById(`qty-${asset.id}`).value));
-            if (isNaN(qty) || qty <= 0) return;
-
-            let total = asset.price * qty;
-            if (isBuy && game.cash >= total) {
-                game.cash -= total; asset.owned += qty;
-                addLog("BURSA", `Membeli ${qty} Unit ${asset.id}`);
-                if(tutorialStep === 1 && asset.id === "AAPL" && asset.owned >= 10) { nextTutorialStep(); }
-            } else if (!isBuy && asset.owned >= qty) {
-                game.cash += total; asset.owned -= qty;
-                addLog("BURSA", `Menjual ${qty} Unit ${asset.id}`);
-            } else { showToast("Gagal melakukan eksekusi!", "error"); }
-            updateUI();
-        }
-
-        function tradeShadow(index, isBuy) {
-            let s = shadowAssets[index];
-            if(isBuy && game.cash >= s.price) { 
-                game.cash -= s.price; s.owned++; 
-                addLog("SHADOW", `Membeli komoditas ilegal ${s.id}`);
-            }
-            else if(!isBuy && s.owned > 0) { 
-                game.cash += s.price * 1.45; s.owned--; 
-                addLog("SHADOW", `Penyelundupan komoditas ${s.id} berhasil dieksekusi.`); 
-            }
-            updateUI();
-        }
-
-        function buyProperty(index) {
-            let p = properties[index];
-            if(game.cash >= p.price) { game.cash -= p.price; p.owned++; addLog("ASET", `Membeli Properti ${p.name}`); updateUI(); }
-            else { showToast("Kas tidak mencukupi!", "error"); }
-        }
-
-        function buyCorporate(index) {
-            let c = corporates[index];
-            if(!c.owned && game.cash >= c.price) { game.cash -= c.price; c.owned = true; addLog("HOLDING", `Akuisisi penuh atas ${c.name}`); updateUI(); }
-            else { showToast("Gagal mengambil alih korporasi!", "error"); }
-        }
-
-        function executeVIP(index) {
-            let n = networkVIP[index];
-            if(game.cash >= n.cost) {
-                game.cash -= n.cost;
-                game.networkScore += 12;
-                addLog("LOBI", `Membangun aliansi dengan ${n.name}`);
-                
-                if(n.rewards === "credit1") maxCreditLimit = 25000;
-                if(n.rewards === "credit2") maxCreditLimit = 250000;
-                if(n.rewards === "sanction") game.sanctionActive = true;
-                if(n.rewards === "tax_shield") taxShieldDays = 100;
-                if(n.rewards === "spy_intel") game.analysisScore += 50;
-                if(n.rewards === "media_monopoly") sabotageCost = 10;
-                if(n.rewards === "oil_pump") { let oil = assets.find(a => a.id === "OIL"); if(oil) oil.price *= 1.3; }
-                
-                // VIP Terobosan Baru
-                if(n.rewards === "corp_shadow") game.myCompany.vipShadow = true;
-                if(n.rewards === "corp_monopoly") game.myCompany.vipMonopoly = true;
-
-                showToast(`Aliansi ${n.id} Terwujud!`);
-                updateUI();
-            } else { showToast("Kas tidak mencukupi untuk biaya konsesi lobi!", "error"); }
-        }
-
-        function borrowMoney() {
-            let val = Math.floor(document.getElementById("input-borrow").value);
-            if(val > 0 && game.debt + val <= maxCreditLimit) { game.cash += val; game.debt += val; updateUI(); }
-            else { showToast("Melebihi batas plafon kredit bank!", "error"); }
-        }
-        function repayDebt() {
-            let val = Math.floor(document.getElementById("input-repay").value);
-            if(val > 0 && game.cash >= val) { game.cash -= val; game.debt -= val; updateUI(); }
-        }
-        function buyBond() {
-            let val = Math.floor(document.getElementById("input-bond").value);
-            if(val > 0 && game.cash >= val) { game.cash -= val; game.bonds.push({ amount: val, days: 30 }); updateUI(); }
-        }
-
-        function applyJob(id) {
-            let j = jobs.find(job => job.id === id);
-            if(game.analysisScore >= j.reqAna && game.networkScore >= j.reqNet) {
-                game.jobName = j.name; game.salary = j.salary; updateUI();
-                if(tutorialStep === 5 && id === "1") { nextTutorialStep(); }
-            } else { showToast("Kualifikasi keahlian/sirkel belum memadai!", "error"); }
-        }
-
-        function generateQuest() {
-            currentQuest = { target: assets[Math.floor(Math.random() * assets.length)].id, reward: 20 };
-            document.getElementById("quest-container").innerHTML = `<div class='card-item'>Riset prospektus emiten <b>${currentQuest.target}</b>.<br><button class='btn btn-buy' style='margin-top:5px;' onclick='completeQuest()'>Kirim Hasil Analisis</button></div>`;
-        }
-        function completeQuest() {
-            if(currentQuest) { game.analysisScore += currentQuest.reward; currentQuest = null; document.getElementById("quest-container").innerHTML = ""; updateUI(); }
-        }
-        function executeSabotage() {
-            let target = document.getElementById("spy-target-select").value;
-            if(game.analysisScore >= sabotageCost) {
-                game.analysisScore -= sabotageCost;
-                let a = assets.find(asset => asset.id === target);
-                if(a) { a.price *= 0.8; addLog("SABOTASE", `Serangan informasi mendepresiasi saham ${target} sebesar -20%`); showToast(`Saham ${target} jatuh!`); updateUI(); }
-            } else { showToast("Poin analisis tidak mencukupi!", "error"); }
-        }
-
-        function switchTab(evt, id) {
-            ["tab-market", "tab-blackmarket", "tab-property", "tab-corporate", "tab-network", "tab-bank", "tab-career", "tab-spy", "tab-mycorporate"].forEach(t => document.getElementById(t).classList.add("hidden"));
-            document.getElementById(id).classList.remove("hidden");
-            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-            if(evt) evt.currentTarget.classList.add("active");
-            if(tutorialStep === 4 && id === "tab-career") { nextTutorialStep(); }
-        }
-
-        function openChartModal(index) {
-            let asset = assets[index];
-            document.getElementById("chart-modal-asset-title").innerText = `GRAFIK TREN HISTORIS: ${asset.id}`;
-            document.getElementById("chart-modal").classList.remove("hidden");
-            renderChart(asset.history);
-        }
-        function closeChartModal() { document.getElementById("chart-modal").classList.add("hidden"); }
-        function renderChart(history) {
-            let canvas = document.getElementById("big-trend-canvas");
-            let ctx = canvas.getContext("2d"); ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = "#10b981"; ctx.lineWidth = 3; ctx.beginPath();
-            let max = Math.max(...history); let min = Math.min(...history);
-            let range = max - min === 0 ? 1 : max - min;
-            history.forEach((price, idx) => {
-                let x = (idx / (history.length - 1)) * (canvas.width - 40) + 20;
-                let y = canvas.height - ((price - min) / range * (canvas.height - 40) + 20);
-                if(idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
-        }
-
-        function checkTutorialOnLoad() { if (localStorage.getItem("tutorial_done_1990") !== "true") { startTutorial(); } }
-        function startTutorial() { tutorialStep = 0; document.getElementById("tutorial-overlay").classList.remove("hidden"); document.body.classList.add("tutorial-locked"); nextTutorialStep(); }
-        function clearHighlights() { document.querySelectorAll(".tutorial-highlight").forEach(el => el.classList.remove("tutorial-highlight")); }
-
-        function nextTutorialStep() {
-            clearHighlights(); tutorialStep++;
-            let tTitle = document.getElementById("tutorial-title");
-            let tText = document.getElementById("tutorial-text");
-            let tBtn = document.getElementById("tutorial-btn");
-            tBtn.classList.remove("hidden");
-
-            if (tutorialStep === 1) {
-                tTitle.innerText = "🏦 Selamat Datang di The Capitalist!";
-                tText.innerText = "Pertama-tama mari kita Beli saham AAPL sebanyak minimal 10 Unit pada tabel bursa saham di bawah ini.";
-                tBtn.classList.add("hidden"); 
-                let targetRow = document.getElementById("qty-AAPL") ? document.getElementById("qty-AAPL").closest('tr') : null;
-                if(targetRow) { targetRow.classList.add("tutorial-highlight"); targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-            } 
-            else if (tutorialStep === 2) {
-                tTitle.innerText = "📈 Berhasil!"; tText.innerText = "Pembelian telah tercatat di portofolio asetmu."; tBtn.innerText = "Lanjut!";
-                document.getElementById("qty-AAPL").closest('tr').classList.add("tutorial-highlight");
-                document.getElementById("qty-AAPL").closest('tr').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            else if (tutorialStep === 3) {
-                tTitle.innerText = "⏳ Hari Berikutnya"; tText.innerText = "Silahkan klik tombol 'HARI BERIKUTNYA⏩' yang berada di kanan atas untuk memproses siklus harian."; tBtn.classList.add("hidden"); 
-                let nextBtn = document.getElementById("tour-nextday-btn"); nextBtn.classList.add("tutorial-highlight");
-                nextBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            else if (tutorialStep === 4) {
-                tTitle.innerText = "💼 Arus Kas Bulanan"; tText.innerText = "Selanjutnya Buka Tab '✉️Lowongan Kerja' untuk mendapatkan pendapatan tetap harian."; tBtn.classList.add("hidden");
-                let tabsRow = document.getElementById("tour-tabs-row"); tabsRow.classList.add("tutorial-highlight");
-                tabsRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            else if (tutorialStep === 5) {
-                tTitle.innerText = "📑 Lamar Jabatan"; 
-                tText.innerText = "Tekan tombol 'Lamar' pada posisi 'Magang Data Entry'."; 
-                tBtn.classList.add("hidden");
-                
-                let firstJobCard = document.getElementById("career-list").firstElementChild;
-                if (firstJobCard) {
-                    firstJobCard.classList.add("tutorial-highlight");
-                    firstJobCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }
-            else if (tutorialStep === 6) {
-                tTitle.innerText = "🚀 Kontrol Terbuka!"; tText.innerText = "Seluruh dasar-dasar permainan ini telah berhasil dilakukan sekarang alur permainan ini sepenuhnya berada pada kendali mu sekarang BERSEMANGATLAH!."; tBtn.innerText = "Mulai Bermain!";
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-            else {
-                document.getElementById("tutorial-overlay").classList.add("hidden"); document.body.classList.remove("tutorial-locked"); 
-                localStorage.setItem("tutorial_done_1990", "true"); clearHighlights(); updateUI();
-            }
-        }
-
-        function addLog(category, msg, type = 'default') { game.logs.unshift({ timestamp: `[${game.day}/${game.month}/${game.year}]`, category, msg, type }); }
-        function toggleLogModal(show) { document.getElementById("log-modal").classList.toggle("hidden", !show); if(show) { document.getElementById("log-target").innerHTML = game.logs.map(l => `<div class='log-entry'><b>${l.timestamp} [${l.category}]</b> ${l.msg}</div>`).join(''); } }
-
-        function updateUI() {
-            document.getElementById("txt-cash").innerText = formatUSD(game.cash);
-            document.getElementById("txt-debt").innerText = formatUSD(game.debt);
-            document.getElementById("txt-date").innerText = `${game.day} ${monthNames[game.month-1]} ${game.year}`;
-            document.getElementById("txt-job").innerText = game.jobName;
-            document.getElementById("txt-network").innerText = `🤝 ${game.networkScore} | 🧠 ${game.analysisScore} Pts`;
-            document.getElementById("txt-credit-limit").innerText = formatUSD(maxCreditLimit);
-
-            if(document.getElementById('txt-macro-cycle')) {
-                document.getElementById('txt-macro-cycle').innerText = `${game.macroCycle} (${(game.inflation * 100).toFixed(1)}%)`;
-            }
-            if(document.getElementById('txt-macro-rate')) {
-                document.getElementById('txt-macro-rate').innerText = (game.interestRate * 100).toFixed(2) + "%";
-            }
-            if(document.getElementById('txt-macro-sentiment')) {
-                document.getElementById('txt-macro-sentiment').innerText = `M2: ${(game.m2MoneySupply / 1000000).toFixed(2)}M | 🤝 ${Math.round(game.marketSentiment)}`;
-            }
-
-            let stocksValue = assets.reduce((acc, a) => acc + (a.price * a.owned), 0);
-            let propValue = properties.reduce((acc, p) => acc + (p.price * p.owned), 0);
-            let bondValue = game.bonds.reduce((acc, b) => acc + b.amount, 0);
-            let netWorth = game.cash + stocksValue + propValue + bondValue;
-
-            document.getElementById("lbl-matrix-cash").innerText = formatUSD(game.cash);
-            document.getElementById("lbl-matrix-stocks").innerText = formatUSD(stocksValue);
-            document.getElementById("lbl-matrix-properties").innerText = formatUSD(propValue);
-            document.getElementById("lbl-matrix-bonds").innerText = formatUSD(bondValue);
-            document.getElementById("lbl-matrix-total").innerText = formatUSD(netWorth);
-
-            let rentIncome = properties.reduce((acc, p) => acc + (p.rent * p.owned), 0);
-            let divIncome = corporates.reduce((acc, c) => acc + (c.owned ? c.dividend : 0), 0);
-            document.getElementById("lbl-summary-salary").innerText = formatUSD(game.salary);
-            document.getElementById("lbl-summary-rent").innerText = formatUSD(rentIncome);
-            document.getElementById("lbl-summary-div").innerText = formatUSD(divIncome);
-
-            if (game.myCompany && game.myCompany.established) {
-                document.getElementById("company-setup-view").classList.add("hidden");
-                document.getElementById("company-dashboard-view").classList.remove("hidden");
-                
-                let comp = game.myCompany;
-                document.getElementById("mycorp-lbl-name").innerText = "PT. " + comp.name;
-                document.getElementById("mycorp-lbl-type").innerText = "Sektor Dagang: " + comp.type;
-                document.getElementById("mycorp-lbl-level").innerText = "Level " + comp.level;
-                
-                let currentProductName = productNames[comp.type][comp.productTier - 1];
-                document.getElementById("mycorp-lbl-product").innerText = `Produk Aktif: ${currentProductName} (Tier ${comp.productTier})`;
-
-                if(comp.strikeActive) {
-                    document.getElementById("mycorp-strike-alert").classList.remove("hidden");
-                } else {
-                    document.getElementById("mycorp-strike-alert").classList.add("hidden");
-                }
-                
-                document.getElementById("mycorp-stat-employees").innerText = comp.employees + " Jiwa";
-                document.getElementById("mycorp-stat-efficiency").innerText = (comp.efficiency * 100).toFixed(1) + "%";
-                document.getElementById("mycorp-stat-raw").innerText = comp.rawMaterials + " Unit";
-                document.getElementById("mycorp-stat-goods").innerText = comp.goods + " Unit";
-                document.getElementById("mycorp-stat-dist").innerText = comp.distributors + " Koridor";
-                document.getElementById("mycorp-stat-shadowdist").innerText = comp.blackMarketDistributors + " Jalur Tikus";
-
-                document.getElementById("mycorp-lbl-rawcost").innerText = comp.vipMonopoly ? "($18/Unit VIP)" : "($40/Unit)";
-                
-                let bondHTML = comp.issuedBonds.length === 0 ? "Tidak ada obligasi PT aktif." : comp.issuedBonds.map(b => `<div>• $${b.amount} (Jatuh tempo: ${b.days} Hari)</div>`).join('');
-                document.getElementById("mycorp-bond-list").innerHTML = bondHTML;
-            } else {
-                document.getElementById("company-setup-view").classList.remove("hidden");
-                document.getElementById("company-dashboard-view").classList.add("hidden");
-            }
-
-            let searchVal = document.getElementById("market-search") ? document.getElementById("market-search").value.toLowerCase() : "";
-            let mHTML = '';
-            assets.forEach((a, i) => {
-                if(a.name.toLowerCase().includes(searchVal) || a.id.toLowerCase().includes(searchVal)) {
-                    mHTML += `<tr>
-                        <td><span class="clickable-asset" onclick="openChartModal(${i})">${a.id}</span><br><small>${a.name}</small></td>
-                        <td><small>${a.type}</small></td>
-                        <td><b class="up">${formatUSD(a.price)}</b></td>
-                        <td>${a.pe ? a.pe.toFixed(1) : '-'}</td>
-                        <td>${a.owned} Unit</td>
-                        <td><input type="number" id="qty-${a.id}" class="input-qty" value="1" min="1"></td>
-                        <td>
-                            <button class="btn btn-buy" onclick="tradeAsset(${i}, true)">Beli</button>
-                            <button class="btn btn-sell" onclick="tradeAsset(${i}, false)">Jual</button>
-                        </td>
-                    </tr>`;
-                }
-            });
-            document.getElementById("market-table-body").innerHTML = mHTML;
-
-            let bmHTML = '';
-            shadowAssets.forEach((s, i) => {
-                bmHTML += `<tr><td><b>${s.id}</b><br><small>${s.name}</small></td><td>${formatUSD(s.price)}</td><td>${(s.risk*100)}%</td><td>${s.owned} unit</td><td><button class='btn btn-buy' onclick='tradeShadow(${i}, true)'>Beli</button> <button class='btn btn-sell' onclick='tradeShadow(${i}, false)'>Penyelundupan (+45%)</button></td></tr>`;
-            });
-            document.getElementById("blackmarket-table-body").innerHTML = bmHTML;
-
-            document.getElementById("property-list").innerHTML = properties.map((p, i) => `<div class='card-item'><h4>${p.name}</h4><p>Harga: ${formatUSD(p.price)} | Sewa Bulanan: <span class='up'>${formatUSD(p.rent)}</span></p><p>Kepemilikan: <b>${p.owned}</b></p><button class='btn btn-buy' onclick='buyProperty(${i})'>Beli Aset</button></div>`).join('');
-
-            document.getElementById("corporate-list").innerHTML = corporates.map((c, i) => `<div class='card-item'><h4>${c.name}</h4><p>Harga Akuisisi: ${formatUSD(c.price)} | Dividen Bulanan: <span class='up'>${formatUSD(c.dividend)}</span></p><button class='btn btn-action' onclick='buyCorporate(${i})' ${c.owned?'disabled':''}>${c.owned?'Sudah Diakuisisi':'Akuisisi Kontrol'}</button></div>`).join('');
-
-            document.getElementById("network-list").innerHTML = networkVIP.map((n, i) => `<div class='card-item'><h4>${n.name}</h4><p>Biaya Konsesi: ${formatUSD(n.cost)}</p><p><small style='color:#cbd5e1;'>${n.desc}</small></p><button class='btn btn-action' onclick='executeVIP(${i})'>Eksekusi Lobi</button></div>`).join('');
-
-            document.getElementById("career-list").innerHTML = jobs.map(j => `<div class='card-item'><h4>${j.name}</h4><p>Gaji Pokok: <span class='up'>${formatUSD(j.salary)}/Bln</span></p><p><small>Syarat: 🧠 ${j.reqAna} Pts, 🤝 ${j.reqNet} Pts</small></p><button class='btn btn-action' onclick='applyJob("${j.id}")' ${game.jobName===j.name?'disabled':''}>${game.jobName===j.name?'Menjabat':'Lamar Jabatan'}</button></div>`).join('');
-
-            document.getElementById("spy-target-select").innerHTML = assets.map(a => `<option value='${a.id}'>${a.id} - ${a.name}</option>`).join('');
-            document.getElementById("bonds-list").innerHTML = game.bonds.length === 0 ? "Tidak ada obligasi aktif." : game.bonds.map(b => `<div>• $${b.amount} (Jatuh tempo: ${b.days} Hari lagi)</div>`).join('');
-            document.getElementById("quick-log-container").innerHTML = game.logs.slice(0, 4).map(l => `<div class='mini-feed'>${l.msg}</div>`).join('');
-        }
-
-        function formatUSD(n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2 }); }
-        window.onload = function() { updateUI(); checkTutorialOnLoad(); };
-    </script>
+    
+    <!-- EVENT LOG -->
+    <div class="glass-card p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Financial Ledger</h3>
+        <button onclick="clearLog()" class="text-xs text-slate-600 hover:text-slate-400 cursor-pointer">Clear</button>
+      </div>
+      <div id="eventLog" class="space-y-1 max-h-44 overflow-y-auto pr-1">
+        <div class="log-entry log-info text-slate-400">Welcome to Finance & Investment! You are 18 years old with $10,000 cash and $30,000 in student debt. Build your fortune before age 65!</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ============================================================
+// GAME STATE
+// ============================================================
+let gameState = {};
+let pendingEvent = null;
+let isProcessingTurn = false;
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const CAREER_LEVELS = [
+  { title: 'Junior Analyst', salary: 3500, netWorthReq: 0, creditReq: 0 },
+  { title: 'Senior Analyst', salary: 5500, netWorthReq: 10000, creditReq: 680 },
+  { title: 'Associate Manager', salary: 8500, netWorthReq: 50000, creditReq: 700 },
+  { title: 'Manager', salary: 13000, netWorthReq: 150000, creditReq: 720 },
+  { title: 'Director', salary: 20000, netWorthReq: 400000, creditReq: 740 },
+  { title: 'VP of Finance', salary: 35000, netWorthReq: 800000, creditReq: 750 },
+  { title: 'Chief Financial Officer', salary: 60000, netWorthReq: 1500000, creditReq: 760 },
+];
+
+const ECONOMY_STATES = ['GROWTH', 'BOOM', 'RECESSION', 'DEPRESSION'];
+
+const LIFE_EVENTS = [
+  {
+    id: 'marketCrash',
+    title: '📉 Market Crash!',
+    icon: '📉',
+    desc: 'A major market correction has hit. All stocks drop 30% instantly. Crypto plummets 50%. Panic selling ensues across Wall Street.',
+    choices: null,
+    effect: (gs) => {
+      ['indexFund','techStock','divStock'].forEach(k => {
+        gs.stocks[k].price = Math.max(1, gs.stocks[k].price * 0.70);
+        gs.stocks[k].history.push(gs.stocks[k].price);
+        if(gs.stocks[k].history.length > 10) gs.stocks[k].history.shift();
+      });
+      gs.crypto.bitcoin.price = Math.max(100, gs.crypto.bitcoin.price * 0.50);
+      gs.crypto.bitcoin.history.push(gs.crypto.bitcoin.price);
+      if(gs.crypto.bitcoin.history.length > 10) gs.crypto.bitcoin.history.shift();
+      addLog('📉 MARKET CRASH: All stocks -30%, Bitcoin -50%!', 'loss');
+      return 'Market Crash: Stocks -30%, Bitcoin -50%';
+    }
+  },
+  {
+    id: 'promotion',
+    title: '🎉 Promotion!',
+    icon: '🎉',
+    desc: 'Your hard work paid off! You\'ve been promoted and received a 15% salary increase. However, lifestyle inflation has crept in — your monthly expenses increase by 5%.',
+    choices: null,
+    effect: (gs) => {
+      const raise = gs.salary * 0.15;
+      gs.salary += raise;
+      gs.livingExpenses = Math.round(gs.livingExpenses * 1.05);
+      addLog(`🎉 PROMOTION! Salary +$${fmt(raise)}/mo. Living expenses increased.`, 'gain');
+      return `Promotion: +$${fmt(raise)}/mo salary, expenses +5%`;
+    }
+  },
+  {
+    id: 'medicalEmergency',
+    title: '🏥 Medical Emergency!',
+    icon: '🏥',
+    desc: 'You\'ve been rushed to the hospital with a serious health issue. This is going to cost you — whether you have insurance or not.',
+    choices: null,
+    effect: (gs) => {
+      const cost = gs.hasHealthInsurance ? 500 : 5000;
+      gs.cash -= cost;
+      const msg = gs.hasHealthInsurance ? 
+        `🏥 Medical Emergency: Insurance covered most of it. Cost: $${fmt(cost)}` :
+        `🏥 Medical Emergency: No insurance! Emergency bill: $${fmt(cost)}. Get health insurance!`;
+      addLog(msg, 'loss');
+      return msg;
+    }
+  },
+  {
+    id: 'cryptoHype',
+    title: '🚀 Crypto Hype Wave!',
+    icon: '🚀',
+    desc: 'Social media influencers and viral posts are driving massive interest in crypto. Bitcoin is expected to surge significantly next turn!',
+    choices: null,
+    effect: (gs) => {
+      gs.cryptoHypeActive = true;
+      addLog('🚀 CRYPTO HYPE: Bitcoin will surge next turn!', 'event');
+      return 'Crypto Hype: Bitcoin surge incoming next turn';
+    }
+  },
+  {
+    id: 'rentIncrease',
+    title: '🏠 Rent Increase Notice!',
+    icon: '🏠',
+    desc: 'Your landlord has sent a notice: monthly rent is increasing by $200 due to rising property values in the area. Your living expenses go up.',
+    choices: null,
+    effect: (gs) => {
+      gs.livingExpenses += 200;
+      addLog('🏠 Rent increased! Living expenses +$200/mo', 'loss');
+      return 'Rent Increase: Living expenses +$200/mo';
+    }
+  },
+  {
+    id: 'sideHustleBoom',
+    title: '💰 Side Hustle Windfall!',
+    icon: '💰',
+    desc: 'One of your passive income streams hit a viral moment! You receive a one-time bonus of $2,500 to $7,500.',
+    choices: null,
+    effect: (gs) => {
+      const bonus = Math.floor(Math.random() * 5000) + 2500;
+      gs.cash += bonus;
+      addLog(`💰 SIDE HUSTLE BOOM! Windfall of $${fmt(bonus)}!`, 'gain');
+      return `Side Hustle Boom: +$${fmt(bonus)} windfall`;
+    }
+  },
+  {
+    id: 'taxSeason',
+    title: '📋 Tax Season!',
+    icon: '📋',
+    desc: 'It\'s tax time. Based on your income bracket, you owe taxes this year. High earners pay more.',
+    choices: null,
+    effect: (gs) => {
+      const taxRate = gs.salary >= 10000 ? 0.28 : gs.salary >= 6000 ? 0.22 : 0.12;
+      const annualIncome = gs.salary * 12;
+      const taxBill = Math.floor(annualIncome * taxRate * 0.08);
+      gs.cash -= Math.max(500, taxBill);
+      addLog(`📋 TAX SEASON: Paid $${fmt(Math.max(500, taxBill))} in taxes (${Math.round(taxRate*100)}% bracket)`, 'loss');
+      return `Tax Season: -$${fmt(Math.max(500,taxBill))}`;
+    }
+  },
+  {
+    id: 'carBreakdown',
+    title: '🚗 Car Breakdown!',
+    icon: '🚗',
+    desc: 'Your car broke down and needs immediate repairs. The mechanic quotes you $1,200 for parts and labor. Without a car, you can\'t work efficiently.',
+    choices: null,
+    effect: (gs) => {
+      gs.cash -= 1200;
+      addLog('🚗 CAR BREAKDOWN: Repair cost $1,200', 'loss');
+      return 'Car Breakdown: -$1,200';
+    }
+  },
+  {
+    id: 'stockTip',
+    title: '📰 Hot Stock Tip!',
+    icon: '📰',
+    desc: 'An analyst on TV is hyping up Tech Stock as "the next big thing." Tech Stock surges 25% today due to market enthusiasm.',
+    choices: null,
+    effect: (gs) => {
+      gs.stocks.techStock.price *= 1.25;
+      gs.stocks.techStock.history.push(gs.stocks.techStock.price);
+      if(gs.stocks.techStock.history.length > 10) gs.stocks.techStock.history.shift();
+      addLog('📰 HOT TIP: Tech Stock surged 25%!', 'gain');
+      return 'Stock tip: Tech Stock +25%';
+    }
+  },
+  {
+    id: 'bonusCheck',
+    title: '🎁 Annual Bonus!',
+    icon: '🎁',
+    desc: 'Great performance this year! Your company awards you an annual bonus equal to one month\'s salary.',
+    choices: null,
+    effect: (gs) => {
+      gs.cash += gs.salary;
+      addLog(`🎁 ANNUAL BONUS: +$${fmt(gs.salary)}!`, 'gain');
+      return `Annual Bonus: +$${fmt(gs.salary)}`;
+    }
+  },
+  {
+    id: 'propertyDamage',
+    title: '🌊 Property Damage!',
+    icon: '🌊',
+    desc: 'A natural disaster has damaged one of your properties. Significant repair costs incoming.',
+    choices: null,
+    effect: (gs) => {
+      if(gs.properties.length === 0) {
+        gs.cash -= 500;
+        addLog('🌊 PROPERTY DAMAGE: No properties affected, minor flooding damage -$500', 'loss');
+        return 'Minor Flooding: -$500';
+      }
+      const propIdx = Math.floor(Math.random() * gs.properties.length);
+      const prop = gs.properties[propIdx];
+      const damageCost = prop.type === 'commercial' ? 15000 : 6000;
+      const actualCost = gs.hasPropertyInsurance ? Math.floor(damageCost * 0.5) : damageCost;
+      gs.cash -= actualCost;
+      prop.value -= damageCost * 0.05;
+      const insMsg = gs.hasPropertyInsurance ? ' (insurance covered 50%)' : ' (no insurance!)';
+      addLog(`🌊 PROPERTY DAMAGE: ${prop.name} damaged! Repair: -$${fmt(actualCost)}${insMsg}`, 'loss');
+      return `Property Damage: -$${fmt(actualCost)}${insMsg}`;
+    }
+  },
+];
+
+function initGame() {
+  gameState = {
+    // Player Info
+    age: 18,
+    turn: 1,
+    year: 1990,
+    month: 0, // January
+    
+    // Financials
+    cash: 10000,
+    salary: 3500,
+    livingExpenses: 2000,
+    studentLoanBalance: 30000,
+    studentLoanOriginal: 30000,
+    studentLoanRate: 0.06,
+    minLoanPayment: 300,
+    
+    // Credit & inflation
+    creditScore: 680,
+    inflationRate: 0.02,
+    
+    // Career
+    careerIndex: 0,
+    
+    // Insurance
+    hasHealthInsurance: false,
+    hasPropertyInsurance: false,
+    
+    // Side Hustles
+    sideHustles: {
+      freelance: false,
+      content: false,
+      contentMonths: 0,
+      business: false,
+    },
+    
+    // Stocks
+    stocks: {
+      indexFund: { price: 100, shares: 0, history: [100], baseReturn: 0.085 },
+      techStock: { price: 50, shares: 0, history: [50], baseReturn: 0.15 },
+      divStock: { price: 75, shares: 0, history: [75], baseReturn: 0.04 },
+    },
+    
+    // Crypto
+    crypto: {
+      bitcoin: { price: 30000, amount: 0, history: [30000], baseReturn: 0.15 },
+    },
+    cryptoHypeActive: false,
+    
+    // Market
+    marketSentiment: 0, // -1 to 1
+    economyState: 'GROWTH',
+    economyCycleTurnsLeft: Math.floor(Math.random() * 25) + 24,
+    
+    // Real Estate
+    properties: [],
+    mortgages: [],
+    
+    // Economy cycle index
+    economyStateIndex: 0,
+    
+    // Stats
+    hysaTotalEarned: 0,
+    dividendsReceived: 0,
+    
+    // Tracking initial price
+    initialResPrice: 200000,
+    initialComPrice: 500000,
+    currentResPrice: 200000,
+    currentComPrice: 500000,
+  };
+  
+  renderAll();
+  addLog('🎮 Game started! Year 1990, Age 22. Good luck building your fortune!', 'info');
+}
+
+// ============================================================
+// ECONOMIC ENGINE
+// ============================================================
+
+function getEconomyMultiplier() {
+  const m = { GROWTH: 1.0, BOOM: 1.4, RECESSION: 0.5, DEPRESSION: 0.1 };
+  return m[gameState.economyState];
+}
+
+function getCryptoMultiplier() {
+  const m = { GROWTH: 1.0, BOOM: 1.8, RECESSION: 0.5, DEPRESSION: 0.2 };
+  return m[gameState.economyState];
+}
+
+function getREAppreciation() {
+  const m = { GROWTH: 0.003, BOOM: 0.007, RECESSION: -0.004, DEPRESSION: -0.012 };
+  return m[gameState.economyState];
+}
+
+function updateMarketSentiment() {
+  const drift = (Math.random() - 0.5) * 0.3;
+  gameState.marketSentiment = Math.max(-1, Math.min(1, gameState.marketSentiment + drift));
+}
+
+function updateEconomyCycle() {
+  gameState.economyCycleTurnsLeft--;
+  if(gameState.economyCycleTurnsLeft <= 0) {
+    const prev = gameState.economyStateIndex;
+    gameState.economyStateIndex = (gameState.economyStateIndex + 1) % 4;
+    // Occasionally skip or jump
+    if(Math.random() < 0.3) {
+      gameState.economyStateIndex = Math.floor(Math.random() * 4);
+    }
+    gameState.economyState = ECONOMY_STATES[gameState.economyStateIndex];
+    gameState.economyCycleTurnsLeft = Math.floor(Math.random() * 25) + 24;
+    addLog(`📊 Economic Cycle Changed: Economy is now in ${gameState.economyState}!`, 'event');
+  }
+}
+
+function updateInflation() {
+  const change = (Math.random() - 0.4) * 0.003;
+  gameState.inflationRate = Math.max(0.005, Math.min(0.12, gameState.inflationRate + change));
+  // Inflation gradually increases living expenses
+  gameState.livingExpenses = Math.round(gameState.livingExpenses * (1 + gameState.inflationRate / 120));
+}
+
+// Random walk with volatility
+function randomWalk(price, annualReturn, volatility, multiplier) {
+  const monthlyReturn = annualReturn / 12;
+  const monthlyVol = volatility / Math.sqrt(12);
+  const z = gaussianRandom();
+  const change = monthlyReturn * multiplier + monthlyVol * z;
+  return Math.max(0.01, price * (1 + change));
+}
+
+function gaussianRandom() {
+  let u = 0, v = 0;
+  while(u === 0) u = Math.random();
+  while(v === 0) v = Math.random();
+  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+}
+
+function updateStocks() {
+  const ecoMult = getEconomyMultiplier();
+  
+  // Index Fund: Low vol
+  const ifPrev = gameState.stocks.indexFund.price;
+  gameState.stocks.indexFund.price = randomWalk(
+    gameState.stocks.indexFund.price, 0.085, 0.14, ecoMult
+  );
+  gameState.stocks.indexFund.history.push(gameState.stocks.indexFund.price);
+  
+  // Tech Stock: High vol
+  const techVol = gameState.economyState === 'BOOM' ? 0.65 : 
+                  gameState.economyState === 'RECESSION' ? 0.70 : 0.50;
+  gameState.stocks.techStock.price = randomWalk(
+    gameState.stocks.techStock.price, 0.15, techVol, ecoMult
+  );
+  gameState.stocks.techStock.history.push(gameState.stocks.techStock.price);
+  
+  // Div Stock: Stable
+  gameState.stocks.divStock.price = randomWalk(
+    gameState.stocks.divStock.price, 0.04, 0.10, ecoMult
+  );
+  gameState.stocks.divStock.history.push(gameState.stocks.divStock.price);
+  
+  // Keep history at 10 entries
+  ['indexFund','techStock','divStock'].forEach(k => {
+    if(gameState.stocks[k].history.length > 10) gameState.stocks[k].history.shift();
+  });
+}
+
+function updateCrypto() {
+  const cryptoMult = getCryptoMultiplier();
+  const sentiment = gameState.marketSentiment;
+  
+  let cryptoVol = 0.7;
+  let cryptoReturn = 0.15 / 12;
+  
+  if(gameState.cryptoHypeActive) {
+    cryptoReturn += 1.0; // 100% surge
+    gameState.cryptoHypeActive = false;
+    addLog('🚀 CRYPTO HYPE: Bitcoin surged due to last turn\'s hype wave!', 'gain');
+  }
+  
+  // Extreme events based on market state
+  if(gameState.economyState === 'DEPRESSION' && Math.random() < 0.12) {
+    // Crypto crash
+    gameState.crypto.bitcoin.price *= (0.2 + Math.random() * 0.2);
+    addLog('₿ BITCOIN CRASH: Extreme selloff! -60% to -80%!', 'loss');
+  } else if(gameState.economyState === 'BOOM' && Math.random() < 0.10) {
+    // Bull run
+    gameState.crypto.bitcoin.price *= (2.0 + Math.random() * 2.0);
+    addLog('₿ BITCOIN BULL RUN: Parabolic move! +200% to +400%!', 'gain');
+  } else {
+    const z = gaussianRandom();
+    const sentimentBoost = sentiment * 0.5;
+    const change = cryptoReturn * cryptoMult + cryptoVol / Math.sqrt(12) * z + sentimentBoost / 12;
+    gameState.crypto.bitcoin.price = Math.max(100, gameState.crypto.bitcoin.price * (1 + change));
+  }
+  
+  gameState.crypto.bitcoin.history.push(gameState.crypto.bitcoin.price);
+  if(gameState.crypto.bitcoin.history.length > 10) gameState.crypto.bitcoin.history.shift();
+}
+
+function updateRealEstate() {
+  const appreciation = getREAppreciation() + (Math.random() - 0.5) * 0.003;
+  gameState.currentResPrice = Math.max(50000, gameState.currentResPrice * (1 + appreciation));
+  gameState.currentComPrice = Math.max(150000, gameState.currentComPrice * (1 + appreciation));
+  
+  gameState.properties.forEach(prop => {
+    const propAppreciation = appreciation + (Math.random() - 0.5) * 0.002;
+    prop.value = Math.max(prop.value * 0.5, prop.value * (1 + propAppreciation));
+  });
+}
+
+// ============================================================
+// TURN PROCESSING
+// ============================================================
+
+function processCashFlows() {
+  let flowLog = [];
+  
+  // Income
+  gameState.cash += gameState.salary;
+  flowLog.push(`💼 Salary: +$${fmt(gameState.salary)}`);
+  
+  // HYSA Interest (4% APY compounded monthly)
+  if(gameState.cash > 0) {
+    const hysaInterest = gameState.cash * (0.04 / 12);
+    gameState.cash += hysaInterest;
+    gameState.hysaTotalEarned += hysaInterest;
+    flowLog.push(`🏦 Savings interest: +$${fmt2(hysaInterest)}`);
+  }
+  
+  // Dividends (quarterly, months 3,6,9,12)
+  if((gameState.turn % 3) === 0 && gameState.stocks.divStock.shares > 0) {
+    const divYield = 0.01; // 1% quarterly
+    const divPayout = gameState.stocks.divStock.shares * gameState.stocks.divStock.price * divYield;
+    gameState.cash += divPayout;
+    gameState.dividendsReceived += divPayout;
+    flowLog.push(`📈 Dividends: +$${fmt2(divPayout)}`);
+    addLog(`📈 Dividend payout received: +$${fmt2(divPayout)}`, 'gain');
+  }
+  
+  // Rental Income
+  let totalRental = 0;
+  let totalPropertyCosts = 0;
+  gameState.properties.forEach(prop => {
+    gameState.cash += prop.rentalIncome;
+    totalRental += prop.rentalIncome;
+    gameState.cash -= prop.maintenanceCost;
+    totalPropertyCosts += prop.maintenanceCost;
+    if(prop.mortgage > 0) {
+      const mortgagePayment = prop.monthlyMortgagePayment;
+      const interestPart = prop.mortgage * (0.065 / 12);
+      const principalPart = mortgagePayment - interestPart;
+      prop.mortgage = Math.max(0, prop.mortgage - principalPart);
+      gameState.cash -= mortgagePayment;
+      totalPropertyCosts += mortgagePayment;
+    }
+  });
+  if(totalRental > 0) flowLog.push(`🏠 Rental: +$${fmt(totalRental)} (costs: -$${fmt(totalPropertyCosts)})`);
+  
+  // Side Hustle Income
+  let sideHustleIncome = 0;
+  if(gameState.sideHustles.freelance) sideHustleIncome += 500;
+  if(gameState.sideHustles.content) {
+    gameState.sideHustles.contentMonths++;
+    const contentIncome = Math.min(gameState.sideHustles.contentMonths * 33, 200);
+    sideHustleIncome += contentIncome;
+  }
+  if(gameState.sideHustles.business) sideHustleIncome += Math.floor(Math.random() * 400 + 600);
+  if(sideHustleIncome > 0) {
+    gameState.cash += sideHustleIncome;
+    flowLog.push(`⚡ Side hustles: +$${fmt(sideHustleIncome)}`);
+  }
+  
+  // Living Expenses
+  gameState.cash -= gameState.livingExpenses;
+  flowLog.push(`🏠 Living expenses: -$${fmt(gameState.livingExpenses)}`);
+  
+  // Student Loan
+  if(gameState.studentLoanBalance > 0) {
+    const interest = gameState.studentLoanBalance * (gameState.studentLoanRate / 12);
+    const payment = Math.min(gameState.studentLoanBalance + interest, gameState.minLoanPayment);
+    gameState.studentLoanBalance = Math.max(0, gameState.studentLoanBalance + interest - payment);
+    gameState.cash -= payment;
+    flowLog.push(`🎓 Loan payment: -$${fmt2(payment)}`);
+    if(gameState.studentLoanBalance === 0) {
+      addLog('🎓 STUDENT LOAN PAID OFF! Your credit score improved!', 'gain');
+      gameState.creditScore = Math.min(850, gameState.creditScore + 30);
+    }
+  }
+  
+  // Insurance
+  const insuranceCost = (gameState.hasHealthInsurance ? 150 : 0) + (gameState.hasPropertyInsurance ? 200 : 0);
+  if(insuranceCost > 0) {
+    gameState.cash -= insuranceCost;
+    flowLog.push(`🛡️ Insurance: -$${fmt(insuranceCost)}`);
+  }
+  
+  addLog(`📅 Turn ${gameState.turn}: ${flowLog.join(' | ')}`, 'info');
+}
+
+function updateCreditScore() {
+  let delta = 0;
+  // Positive: no missed payments, high NW, low debt ratio
+  if(gameState.cash > 0) delta += 1;
+  if(gameState.studentLoanBalance === 0) delta += 0.5;
+  const totalAssets = calcTotalAssets();
+  const totalLiab = calcTotalLiabilities();
+  const debtToAsset = totalAssets > 0 ? totalLiab / totalAssets : 1;
+  if(debtToAsset < 0.3) delta += 1;
+  else if(debtToAsset > 0.8) delta -= 1;
+  if(gameState.cash < 0) delta -= 5;
+  
+  // Random drift
+  delta += (Math.random() - 0.5) * 2;
+  gameState.creditScore = Math.round(Math.max(300, Math.min(850, gameState.creditScore + delta)));
+}
+
+// ============================================================
+// CALCULATIONS
+// ============================================================
+
+function calcStockValue() {
+  const s = gameState.stocks;
+  return s.indexFund.shares * s.indexFund.price +
+         s.techStock.shares * s.techStock.price +
+         s.divStock.shares * s.divStock.price;
+}
+
+function calcCryptoValue() {
+  return gameState.crypto.bitcoin.amount * gameState.crypto.bitcoin.price;
+}
+
+function calcREValue() {
+  return gameState.properties.reduce((sum, p) => sum + p.value, 0);
+}
+
+function calcTotalAssets() {
+  return Math.max(0, gameState.cash) + calcStockValue() + calcCryptoValue() + calcREValue();
+}
+
+function calcTotalLiabilities() {
+  const mortgages = gameState.properties.reduce((sum, p) => sum + p.mortgage, 0);
+  return gameState.studentLoanBalance + mortgages;
+}
+
+function calcNetWorth() {
+  return calcTotalAssets() - calcTotalLiabilities();
+}
+
+function calcMonthlyIncome() {
+  let income = gameState.salary;
+  if(gameState.sideHustles.freelance) income += 500;
+  if(gameState.sideHustles.content) income += Math.min(gameState.sideHustles.contentMonths * 33, 200);
+  if(gameState.sideHustles.business) income += 800;
+  income += gameState.properties.reduce((s,p) => s + p.rentalIncome, 0);
+  income += gameState.cash > 0 ? gameState.cash * (0.04/12) : 0;
+  return income;
+}
+
+function calcMonthlyExpenses() {
+  let exp = gameState.livingExpenses + gameState.minLoanPayment;
+  if(gameState.hasHealthInsurance) exp += 150;
+  if(gameState.hasPropertyInsurance) exp += 200;
+  exp += gameState.properties.reduce((s,p) => s + p.maintenanceCost + (p.mortgage > 0 ? p.monthlyMortgagePayment : 0), 0);
+  return exp;
+}
+
+function calcPassiveIncome() {
+  let passive = 0;
+  passive += gameState.properties.reduce((s,p) => s + p.rentalIncome - p.maintenanceCost - (p.mortgage > 0 ? p.monthlyMortgagePayment : 0), 0);
+  passive += gameState.cash > 0 ? gameState.cash * (0.04/12) : 0;
+  if(gameState.sideHustles.business) passive += 800;
+  if(gameState.sideHustles.content && gameState.sideHustles.contentMonths >= 6) passive += 200;
+  return passive;
+}
+
+// ============================================================
+// MAIN TURN ENGINE
+// ============================================================
+
+function endTurn() {
+  if(isProcessingTurn) return;
+  isProcessingTurn = true;
+  
+  document.getElementById('endTurnBtn').disabled = true;
+  document.getElementById('endTurnBtn').textContent = '⏳ Processing...';
+  
+  setTimeout(() => {
+    doEndTurn();
+    document.getElementById('endTurnBtn').disabled = false;
+    document.getElementById('endTurnBtn').innerHTML = '▶ END TURN';
+    isProcessingTurn = false;
+  }, 200);
+}
+
+function doEndTurn() {
+  // Advance time
+  gameState.turn++;
+  gameState.month = (gameState.month + 1) % 12;
+  if(gameState.month === 0) {
+    gameState.year++;
+    gameState.age++;
+  }
+  
+  // Update macroeconomic variables
+  updateMarketSentiment();
+  updateEconomyCycle();
+  updateInflation();
+  
+  // Update asset prices
+  updateStocks();
+  updateCrypto();
+  updateRealEstate();
+  
+  // Process cash flows
+  processCashFlows();
+  
+  // Update credit score
+  updateCreditScore();
+  
+  // Check for life event (15% chance)
+  if(Math.random() < 0.15) {
+    const ev = LIFE_EVENTS[Math.floor(Math.random() * LIFE_EVENTS.length)];
+    triggerLifeEvent(ev);
+  }
+  
+  // Check win/loss conditions
+  const nw = calcNetWorth();
+  const passive = calcPassiveIncome();
+  const expenses = calcMonthlyExpenses();
+  
+  if(nw >= 2000000) {
+    showGameModal('win', nw);
+    return;
+  }
+  
+  if(passive > 0 && passive >= expenses && nw > 0) {
+    showGameModal('passive_win', nw);
+    return;
+  }
+  
+  if(gameState.cash < 0) {
+    showGameModal('bankruptcy', nw);
+    return;
+  }
+  
+  if(gameState.age >= 65) {
+    showGameModal('retired', nw);
+    return;
+  }
+  
+  // Render
+  renderAll();
+}
+
+// ============================================================
+// LIFE EVENTS
+// ============================================================
+
+function triggerLifeEvent(ev) {
+  const result = ev.effect(gameState);
+  
+  // Show modal
+  document.getElementById('eventIcon').textContent = ev.icon;
+  document.getElementById('eventTitle').textContent = ev.title;
+  document.getElementById('eventDesc').textContent = ev.desc;
+  document.getElementById('eventChoices').innerHTML = '';
+  document.getElementById('eventDismiss').style.display = 'block';
+  document.getElementById('eventModal').style.display = 'flex';
+  
+  addLog(`⚡ LIFE EVENT: ${ev.title}`, 'event');
+}
+
+function dismissEvent() {
+  document.getElementById('eventModal').style.display = 'none';
+  renderAll();
+}
+
+// ============================================================
+// BUY / SELL
+// ============================================================
+
+function buyStock(ticker) {
+  const inputEl = document.getElementById(`buy-${ticker}`);
+  const qty = parseFloat(inputEl.value);
+  if(isNaN(qty) || qty <= 0) { addLog('⚠️ Enter a valid quantity', 'warn'); return; }
+  
+  let price, shareKey;
+  if(ticker === 'bitcoin') {
+    price = gameState.crypto.bitcoin.price * qty;
+    shareKey = 'amount';
+  } else {
+    if(!Number.isInteger(qty)) { addLog('⚠️ Must buy whole shares for stocks', 'warn'); return; }
+    price = gameState.stocks[ticker].price * qty;
+    shareKey = 'shares';
+  }
+  
+  if(price > gameState.cash) {
+    addLog(`⚠️ Insufficient funds! Need $${fmt2(price)}, have $${fmt2(gameState.cash)}`, 'warn');
+    return;
+  }
+  
+  gameState.cash -= price;
+  if(ticker === 'bitcoin') {
+    gameState.crypto.bitcoin.amount += qty;
+  } else {
+    gameState.stocks[ticker].shares += qty;
+  }
+  
+  addLog(`✅ Bought ${qty} ${ticker === 'bitcoin' ? 'BTC' : 'shares of ' + ticker} for $${fmt2(price)}`, 'gain');
+  inputEl.value = '';
+  renderAll();
+}
+
+function sellStock(ticker) {
+  const inputEl = document.getElementById(`buy-${ticker}`);
+  const qty = parseFloat(inputEl.value);
+  if(isNaN(qty) || qty <= 0) { addLog('⚠️ Enter quantity to sell', 'warn'); return; }
+  
+  let currentHeld, saleValue;
+  if(ticker === 'bitcoin') {
+    currentHeld = gameState.crypto.bitcoin.amount;
+    saleValue = gameState.crypto.bitcoin.price * qty;
+  } else {
+    if(!Number.isInteger(qty)) { addLog('⚠️ Must sell whole shares', 'warn'); return; }
+    currentHeld = gameState.stocks[ticker].shares;
+    saleValue = gameState.stocks[ticker].price * qty;
+  }
+  
+  if(qty > currentHeld) {
+    addLog(`⚠️ You only hold ${currentHeld} ${ticker === 'bitcoin' ? 'BTC' : 'shares'}!`, 'warn');
+    return;
+  }
+  
+  if(ticker === 'bitcoin') {
+    gameState.crypto.bitcoin.amount = Math.max(0, gameState.crypto.bitcoin.amount - qty);
+  } else {
+    gameState.stocks[ticker].shares -= qty;
+  }
+  
+  gameState.cash += saleValue;
+  addLog(`💰 Sold ${qty} ${ticker === 'bitcoin' ? 'BTC' : 'shares of ' + ticker} for $${fmt2(saleValue)}`, 'gain');
+  inputEl.value = '';
+  renderAll();
+}
+
+function buyProperty(type) {
+  const isResidential = type === 'residential';
+  const propPrice = isResidential ? gameState.currentResPrice : gameState.currentComPrice;
+  const downPaymentPct = isResidential ? 0.20 : 0.25;
+  const downPayment = propPrice * downPaymentPct;
+  const minCredit = isResidential ? 650 : 720;
+  const rentalIncome = isResidential ? 1200 : 3500;
+  const maintenanceCost = isResidential ? 400 : 1000;
+  const mortgageRate = 0.065; // 6.5%
+  const mortgageAmount = propPrice - downPayment;
+  const mortgageTermMonths = 360; // 30 years
+  const monthlyRate = mortgageRate / 12;
+  const monthlyMortgagePayment = mortgageAmount * (monthlyRate * Math.pow(1 + monthlyRate, mortgageTermMonths)) / (Math.pow(1 + monthlyRate, mortgageTermMonths) - 1);
+  
+  if(gameState.creditScore < minCredit) {
+    addLog(`⚠️ Credit score too low! Need ${minCredit}, have ${gameState.creditScore}`, 'warn');
+    return;
+  }
+  
+  if(gameState.cash < downPayment) {
+    addLog(`⚠️ Insufficient cash for down payment! Need $${fmt2(downPayment)}, have $${fmt2(gameState.cash)}`, 'warn');
+    return;
+  }
+  
+  gameState.cash -= downPayment;
+  const propName = isResidential ? `Residential #${gameState.properties.filter(p=>p.type==='residential').length+1}` : `Commercial #${gameState.properties.filter(p=>p.type==='commercial').length+1}`;
+  
+  gameState.properties.push({
+    type,
+    name: propName,
+    value: propPrice,
+    purchasePrice: propPrice,
+    mortgage: mortgageAmount,
+    monthlyMortgagePayment: Math.round(monthlyMortgagePayment),
+    rentalIncome,
+    maintenanceCost,
+    purchasedTurn: gameState.turn,
+  });
+  
+  addLog(`🏠 Purchased ${propName} for $${fmt2(propPrice)}! Down: $${fmt2(downPayment)}, Mortgage: $${fmt2(mortgageAmount)}`, 'gain');
+  gameState.creditScore = Math.max(300, gameState.creditScore - 15); // Hard inquiry
+  renderAll();
+}
+
+function makeExtraLoanPayment() {
+  if(gameState.studentLoanBalance <= 0) { addLog('✅ Student loan already paid off!', 'info'); return; }
+  const extraEl = document.getElementById('extraLoanPayment');
+  const amount = parseFloat(extraEl.value);
+  if(isNaN(amount) || amount <= 0) { addLog('⚠️ Enter a valid payment amount', 'warn'); return; }
+  if(amount > gameState.cash) { addLog(`⚠️ Insufficient cash! Have $${fmt2(gameState.cash)}`, 'warn'); return; }
+  const actualPayment = Math.min(amount, gameState.studentLoanBalance);
+  gameState.cash -= actualPayment;
+  gameState.studentLoanBalance -= actualPayment;
+  addLog(`🎓 Extra loan payment: -$${fmt2(actualPayment)}. Remaining: $${fmt2(gameState.studentLoanBalance)}`, 'gain');
+  if(gameState.studentLoanBalance === 0) {
+    addLog('🎉 STUDENT LOAN PAID OFF EARLY! Credit score +30!', 'gain');
+    gameState.creditScore = Math.min(850, gameState.creditScore + 30);
+  }
+  extraEl.value = '';
+  renderAll();
+}
+
+function toggleInsurance(type) {
+  if(type === 'health') {
+    gameState.hasHealthInsurance = !gameState.hasHealthInsurance;
+    addLog(gameState.hasHealthInsurance ? '🛡️ Health insurance activated. $150/mo' : '⚠️ Health insurance cancelled!', gameState.hasHealthInsurance ? 'gain' : 'warn');
+  } else {
+    gameState.hasPropertyInsurance = !gameState.hasPropertyInsurance;
+    addLog(gameState.hasPropertyInsurance ? '🛡️ Property insurance activated. $200/mo' : '⚠️ Property insurance cancelled!', gameState.hasPropertyInsurance ? 'gain' : 'warn');
+  }
+  renderAll();
+}
+
+function toggleSideHustle(type) {
+  if(type === 'freelance') {
+    gameState.sideHustles.freelance = !gameState.sideHustles.freelance;
+    addLog(gameState.sideHustles.freelance ? '⚡ Started freelancing! +$500/mo' : '⚡ Stopped freelancing', gameState.sideHustles.freelance ? 'gain' : 'warn');
+  } else if(type === 'content') {
+    gameState.sideHustles.content = !gameState.sideHustles.content;
+    if(gameState.sideHustles.content) gameState.sideHustles.contentMonths = 0;
+    addLog(gameState.sideHustles.content ? '⚡ Started content creation!' : '⚡ Stopped content creation', gameState.sideHustles.content ? 'gain' : 'warn');
+  } else if(type === 'business') {
+    if(!gameState.sideHustles.business) {
+      if(gameState.cash < 2000) { addLog('⚠️ Need $2,000 to start a business!', 'warn'); return; }
+      gameState.cash -= 2000;
+      gameState.sideHustles.business = true;
+      addLog('⚡ Online business launched! Cost $2,000. Generating ~$800/mo.', 'gain');
+    } else {
+      gameState.sideHustles.business = false;
+      addLog('⚡ Closed online business', 'warn');
+    }
+  }
+  renderAll();
+}
+
+function applyForPromotion(levelIdx) {
+  const level = CAREER_LEVELS[levelIdx];
+  const nw = calcNetWorth();
+  if(nw < level.netWorthReq) { addLog(`⚠️ Need net worth of $${fmt(level.netWorthReq)} for this role`, 'warn'); return; }
+  if(gameState.creditScore < level.creditReq) { addLog(`⚠️ Need credit score of ${level.creditReq} for this role`, 'warn'); return; }
+  gameState.careerIndex = levelIdx;
+  gameState.salary = level.salary;
+  addLog(`🎉 CAREER CHANGE: Now a ${level.title} at $${fmt(level.salary)}/mo!`, 'gain');
+  renderAll();
+}
+
+// ============================================================
+// RENDERING
+// ============================================================
+
+function fmt(n) {
+  return Math.abs(n) >= 1000000 
+    ? (n/1000000).toFixed(2) + 'M'
+    : Math.abs(n) >= 1000 
+    ? n.toLocaleString('en-US', {minimumFractionDigits:0,maximumFractionDigits:0})
+    : n.toFixed(0);
+}
+
+function fmt2(n) {
+  return n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function fmtC(n) {
+  const abs = Math.abs(n);
+  const str = abs >= 1000000 ? (abs/1000000).toFixed(2)+'M' : abs.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return (n < 0 ? '-$' : '$') + str;
+}
+
+function renderAll() {
+  renderHeader();
+  renderSidebar();
+  renderMarkets();
+  renderRealEstate();
+  renderCareer();
+}
+
+function renderHeader() {
+  const age = gameState.age;
+  const nw = calcNetWorth();
+  const month = `${MONTHS[gameState.month]} ${gameState.year}`;
+  
+  document.getElementById('hdrAge').textContent = age;
+  document.getElementById('hdrMonth').textContent = month;
+  document.getElementById('hdrCash').textContent = fmtC(gameState.cash);
+  document.getElementById('hdrCash').className = `font-mono font-bold text-sm font-mono ${gameState.cash < 0 ? 'neon-red' : 'neon-green'}`;
+  document.getElementById('hdrNetWorth').textContent = fmtC(nw);
+  document.getElementById('hdrNetWorth').className = `font-mono font-bold text-white text-sm ${nw < 0 ? 'neon-red' : nw >= 1000000 ? 'neon-purple' : 'text-white'}`;
+  document.getElementById('hdrTurn').textContent = gameState.turn;
+  
+  const econEl = document.getElementById('hdrEconomy');
+  econEl.textContent = `● ${gameState.economyState}`;
+  econEl.className = `badge economy-${gameState.economyState}`;
+  
+  // Goal progress
+  const goalPct = Math.max(0, Math.min(100, (nw / 2000000) * 100));
+  document.getElementById('goalProgress').style.width = goalPct + '%';
+  document.getElementById('goalPct').textContent = goalPct.toFixed(1) + '%';
+}
+
+function renderSidebar() {
+  const gs = gameState;
+  const nw = calcNetWorth();
+  const totalAssets = calcTotalAssets();
+  const totalLiab = calcTotalLiabilities();
+  
+  // Income Statement
+  const sideHustleIncome = (gs.sideHustles.freelance ? 500 : 0) + 
+    (gs.sideHustles.content ? Math.min(gs.sideHustles.contentMonths*33,200) : 0) +
+    (gs.sideHustles.business ? 800 : 0);
+  const rentalIncome = gs.properties.reduce((s,p) => s+p.rentalIncome, 0);
+  const hysaIncome = Math.max(0, gs.cash) * (0.04/12);
+  const divIncome = (gs.turn % 3 === 0 && gs.stocks.divStock.shares > 0) 
+    ? gs.stocks.divStock.shares * gs.stocks.divStock.price * 0.01 : 0;
+  
+  const propCosts = gs.properties.reduce((s,p) => s + p.maintenanceCost + (p.mortgage>0?p.monthlyMortgagePayment:0), 0);
+  const insuranceCost = (gs.hasHealthInsurance?150:0) + (gs.hasPropertyInsurance?200:0);
+  const totalIn = gs.salary + sideHustleIncome + rentalIncome + hysaIncome + divIncome;
+  const totalOut = gs.livingExpenses + gs.minLoanPayment + propCosts + insuranceCost;
+  const netFlow = totalIn - totalOut;
+  
+  document.getElementById('incomeSalary').textContent = `$${fmt(gs.salary + sideHustleIncome)}`;
+  document.getElementById('incomeDivs').textContent = fmtC(divIncome);
+  document.getElementById('incomeRental').textContent = fmtC(rentalIncome);
+  document.getElementById('incomeSavings').textContent = `$${fmt2(hysaIncome)}`;
+  document.getElementById('totalIncome').textContent = fmtC(totalIn);
+  document.getElementById('expLiving').textContent = `-$${fmt(gs.livingExpenses)}`;
+  document.getElementById('expLoan').textContent = gs.studentLoanBalance > 0 ? `-$${fmt(gs.minLoanPayment)}` : '$0';
+  document.getElementById('expInsurance').textContent = `-$${fmt(insuranceCost)}`;
+  document.getElementById('expProperty').textContent = `-$${fmt(propCosts)}`;
+  document.getElementById('totalExpenses').textContent = `-$${fmt(totalOut)}`;
+  
+  const nfEl = document.getElementById('netCashFlow');
+  nfEl.textContent = fmtC(netFlow);
+  nfEl.className = `font-mono font-bold text-lg ${netFlow >= 0 ? 'neon-green' : 'neon-red'}`;
+  
+  // Balance Sheet
+  document.getElementById('bsCash').textContent = fmtC(Math.max(0, gs.cash));
+  document.getElementById('bsStocks').textContent = fmtC(calcStockValue());
+  document.getElementById('bsCrypto').textContent = fmtC(calcCryptoValue());
+  document.getElementById('bsRE').textContent = fmtC(calcREValue());
+  document.getElementById('bsTotalAssets').textContent = fmtC(totalAssets);
+  document.getElementById('bsStudentLoan').textContent = fmtC(gs.studentLoanBalance);
+  const mortgageTotal = gs.properties.reduce((s,p)=>s+p.mortgage,0);
+  document.getElementById('bsMortgage').textContent = fmtC(mortgageTotal);
+  document.getElementById('bsTotalLiab').textContent = fmtC(totalLiab);
+  const nwEl = document.getElementById('bsNetWorth');
+  nwEl.textContent = fmtC(nw);
+  nwEl.className = `font-mono font-bold text-lg ${nw >= 0 ? 'neon-green' : 'neon-red'}`;
+  
+  // Credit Score
+  const cs = gs.creditScore;
+  document.getElementById('creditScoreVal').textContent = cs;
+  document.getElementById('creditScoreBar').style.width = ((cs-300)/550*100) + '%';
+  const csLabel = cs >= 800 ? 'Exceptional' : cs >= 740 ? 'Very Good' : cs >= 670 ? 'Good' : cs >= 580 ? 'Fair' : 'Poor';
+  document.getElementById('creditScoreLabel').textContent = csLabel;
+  
+  // Inflation
+  const infPct = (gs.inflationRate * 100).toFixed(1);
+  document.getElementById('inflationVal').textContent = infPct + '%';
+  document.getElementById('inflationBar').style.width = (gs.inflationRate / 0.12 * 100) + '%';
+  
+  // Age bar
+  const agePct = ((gs.age - 22) / 43 * 100).toFixed(1);
+  document.getElementById('ageBar').style.width = agePct + '%';
+  
+  // Career
+  document.getElementById('careerLevel').textContent = CAREER_LEVELS[gs.careerIndex].title;
+  
+  // Insurance status
+  const hiS = document.getElementById('healthInsStatus');
+  hiS.textContent = gs.hasHealthInsurance ? '✓ Active' : '✗ None';
+  hiS.className = gs.hasHealthInsurance ? 'text-xs font-semibold text-green-400' : 'text-xs font-semibold text-red-400';
+  
+  // Market sentiment
+  const sentEl = document.getElementById('marketSentiment');
+  const sent = gs.marketSentiment;
+  const sentText = sent > 0.5 ? '🤑 Bullish' : sent > 0.1 ? '😊 Optimistic' : sent > -0.1 ? '😐 Neutral' : sent > -0.5 ? '😟 Pessimistic' : '😱 Bearish';
+  sentEl.textContent = sentText;
+  
+  // HYSA
+  document.getElementById('hysaCash').textContent = fmtC(Math.max(0, gs.cash));
+  document.getElementById('hysaMonthlyInt').textContent = fmtC(Math.max(0, gs.cash * 0.04/12));
+  document.getElementById('hysaTotalEarned').textContent = fmtC(gs.hysaTotalEarned);
+}
+
+function renderMarkets() {
+  const gs = gameState;
+  
+  // Stocks
+  const stocks = [
+    { id: 'indexFund', label: 'Index Fund' },
+    { id: 'techStock', label: 'Tech Stock' },
+    { id: 'divStock', label: 'Dividend Stock' },
+  ];
+  
+  stocks.forEach(({ id }) => {
+    const s = gs.stocks[id];
+    const prev = s.history.length >= 2 ? s.history[s.history.length - 2] : s.price;
+    const change = ((s.price - prev) / prev * 100).toFixed(2);
+    const isUp = s.price >= prev;
+    
+    document.getElementById(`price-${id}`).textContent = `$${fmt2(s.price)}`;
+    document.getElementById(`price-${id}`).className = `font-mono font-bold text-sm ${isUp ? 'neon-green' : 'neon-red'}`;
+    const changeEl = document.getElementById(`change-${id}`);
+    changeEl.textContent = `${isUp ? '+' : ''}${change}%`;
+    changeEl.className = `text-xs font-mono ${isUp ? 'neon-green' : 'neon-red'}`;
+    document.getElementById(`held-${id}`).textContent = `${s.shares} shares`;
+    document.getElementById(`value-${id}`).textContent = fmtC(s.shares * s.price);
+    
+    drawMiniChart(`chart-${id}`, s.history, isUp ? '#4ade80' : '#f87171');
+  });
+  
+  // Crypto
+  const btc = gs.crypto.bitcoin;
+  const btcPrev = btc.history.length >= 2 ? btc.history[btc.history.length-2] : btc.price;
+  const btcChange = ((btc.price - btcPrev) / btcPrev * 100).toFixed(2);
+  const btcUp = btc.price >= btcPrev;
+  document.getElementById('price-bitcoin').textContent = `$${fmt(Math.round(btc.price))}`;
+  document.getElementById('price-bitcoin').className = `font-mono font-bold neon-yellow text-sm`;
+  const btcChangeEl = document.getElementById('change-bitcoin');
+  btcChangeEl.textContent = `${btcUp ? '+' : ''}${btcChange}%`;
+  btcChangeEl.className = `text-xs font-mono ${btcUp ? 'neon-green' : 'neon-red'}`;
+  document.getElementById('held-bitcoin').textContent = `${btc.amount.toFixed(4)} BTC`;
+  document.getElementById('value-bitcoin').textContent = fmtC(btc.amount * btc.price);
+  drawMiniChart('chart-bitcoin', btc.history, '#fbbf24');
+  
+  // Portfolio summary
+  const hasPortfolio = calcStockValue() + calcCryptoValue() > 0;
+  const summaryEl = document.getElementById('portfolioSummary');
+  if(hasPortfolio) {
+    summaryEl.classList.remove('hidden');
+    const list = document.getElementById('portfolioList');
+    let html = '';
+    if(gs.stocks.indexFund.shares > 0) html += `<div class="flex justify-between"><span class="text-slate-400">Index Fund</span><span class="font-mono neon-green">${gs.stocks.indexFund.shares} shares · ${fmtC(gs.stocks.indexFund.shares * gs.stocks.indexFund.price)}</span></div>`;
+    if(gs.stocks.techStock.shares > 0) html += `<div class="flex justify-between"><span class="text-slate-400">Tech Stock</span><span class="font-mono neon-blue">${gs.stocks.techStock.shares} shares · ${fmtC(gs.stocks.techStock.shares * gs.stocks.techStock.price)}</span></div>`;
+    if(gs.stocks.divStock.shares > 0) html += `<div class="flex justify-between"><span class="text-slate-400">Div. Stock</span><span class="font-mono neon-purple">${gs.stocks.divStock.shares} shares · ${fmtC(gs.stocks.divStock.shares * gs.stocks.divStock.price)}</span></div>`;
+    if(btc.amount > 0) html += `<div class="flex justify-between"><span class="text-slate-400">Bitcoin</span><span class="font-mono neon-yellow">${btc.amount.toFixed(4)} BTC · ${fmtC(btc.amount * btc.price)}</span></div>`;
+    list.innerHTML = html;
+  } else {
+    summaryEl.classList.add('hidden');
+  }
+  
+  // HYSA update in market tab
+  document.getElementById('hysaCash').textContent = fmtC(Math.max(0, gs.cash));
+  document.getElementById('hysaMonthlyInt').textContent = fmtC(Math.max(0, gs.cash) * 0.04/12);
+}
+
+function drawMiniChart(canvasId, history, color) {
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  
+  if(history.length < 2) return;
+  
+  const min = Math.min(...history);
+  const max = Math.max(...history);
+  const range = max - min || 1;
+  
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, color + '40');
+  grad.addColorStop(1, color + '00');
+  
+  ctx.beginPath();
+  history.forEach((val, i) => {
+    const x = (i / (history.length - 1)) * w;
+    const y = h - ((val - min) / range) * (h - 4) - 2;
+    if(i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  
+  // Fill area
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+  
+  // Draw line
+  ctx.beginPath();
+  history.forEach((val, i) => {
+    const x = (i / (history.length - 1)) * w;
+    const y = h - ((val - min) / range) * (h - 4) - 2;
+    if(i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+function renderRealEstate() {
+  const gs = gameState;
+  
+  // Update prices
+  document.getElementById('resPrice').textContent = fmtC(gs.currentResPrice);
+  document.getElementById('comPrice').textContent = fmtC(gs.currentComPrice);
+  document.getElementById('resDownPayment').textContent = fmtC(gs.currentResPrice * 0.20);
+  document.getElementById('resMortgage').textContent = fmtC(gs.currentResPrice * 0.80);
+  document.getElementById('comDownPayment').textContent = fmtC(gs.currentComPrice * 0.25);
+  document.getElementById('comMortgage').textContent = fmtC(gs.currentComPrice * 0.75);
+  
+  // Loan
+  document.getElementById('loanBalance').textContent = fmtC(gs.studentLoanBalance);
+  document.getElementById('loanMonthlyInt').textContent = fmtC(gs.studentLoanBalance * gs.studentLoanRate / 12);
+  
+  if(gs.studentLoanBalance > 0) {
+    const bal = gs.studentLoanBalance;
+    const rate = gs.studentLoanRate / 12;
+    const pmt = gs.minLoanPayment;
+    const months = bal > 0 ? Math.ceil(-Math.log(1 - (rate * bal / pmt)) / Math.log(1 + rate)) : 0;
+    document.getElementById('loanPayoffMonths').textContent = `~${months} months`;
+  } else {
+    document.getElementById('loanPayoffMonths').textContent = 'PAID OFF! ✅';
+  }
+  
+  const paidPct = ((1 - gs.studentLoanBalance / gs.studentLoanOriginal) * 100).toFixed(1);
+  document.getElementById('loanProgress').style.width = Math.max(0, paidPct) + '%';
+  document.getElementById('loanPaidPct').textContent = paidPct + '%';
+  
+  // Properties owned
+  const propsSection = document.getElementById('propertiesOwned');
+  const propsList = document.getElementById('propertiesList');
+  
+  if(gs.properties.length > 0) {
+    propsSection.classList.remove('hidden');
+    propsList.innerHTML = gs.properties.map((prop, idx) => `
+      <div class="glass-card p-3">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <div class="font-semibold text-sm text-white">${prop.name}</div>
+            <div class="text-xs text-slate-500">${prop.type === 'residential' ? 'Residential' : 'Commercial'} Property</div>
+          </div>
+          <div class="text-right">
+            <div class="font-mono neon-blue text-sm">${fmtC(prop.value)}</div>
+            <div class="text-xs ${prop.value >= prop.purchasePrice ? 'neon-green' : 'neon-red'}">${prop.value >= prop.purchasePrice ? '+' : ''}${((prop.value/prop.purchasePrice-1)*100).toFixed(1)}% from purchase</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-xs text-slate-400">
+          <div>Rental: <span class="neon-green">$${fmt(prop.rentalIncome)}/mo</span></div>
+          <div>Costs: <span class="neon-red">$${fmt(prop.maintenanceCost)}/mo</span></div>
+          <div>Mortgage: <span class="neon-red">${prop.mortgage > 0 ? fmtC(prop.mortgage) : '✅ Paid'}</span></div>
+        </div>
+        ${prop.mortgage > 0 ? `<div class="mt-1 progress-bar"><div class="progress-fill" style="width:${((1 - prop.mortgage / (prop.type === 'residential' ? gs.currentResPrice*0.8 : gs.currentComPrice*0.75))*100).toFixed(0)}%;background:#4ade80"></div></div>` : ''}
+      </div>
+    `).join('');
+  } else {
+    propsSection.classList.add('hidden');
+  }
+}
+
+function renderCareer() {
+  const gs = gameState;
+  const nw = calcNetWorth();
+  
+  document.getElementById('currentJobTitle').textContent = CAREER_LEVELS[gs.careerIndex].title;
+  document.getElementById('currentSalary').textContent = `$${fmt(gs.salary)}/mo`;
+  
+  // Insurance buttons
+  const hBtn = document.getElementById('healthInsBtn');
+  const hStatus = document.getElementById('healthInsStatusCard');
+  if(gs.hasHealthInsurance) {
+    hBtn.textContent = 'Cancel Health Insurance';
+    hBtn.className = 'btn-danger w-full text-white font-semibold py-2 rounded-lg cursor-pointer text-sm';
+    hStatus.textContent = '✓ Covered';
+    hStatus.className = 'font-semibold text-green-400';
+    document.getElementById('healthInsStatus').textContent = '✓ Active';
+    document.getElementById('healthInsStatus').className = 'text-xs font-semibold text-green-400';
+  } else {
+    hBtn.textContent = 'Buy Health Insurance ($150/mo)';
+    hBtn.className = 'btn-primary w-full text-white font-semibold py-2 rounded-lg cursor-pointer text-sm';
+    hStatus.textContent = '✗ Not Covered';
+    hStatus.className = 'font-semibold text-red-400';
+  }
+  
+  const pBtn = document.getElementById('propInsBtn');
+  const pStatus = document.getElementById('propInsStatusCard');
+  if(gs.hasPropertyInsurance) {
+    pBtn.textContent = 'Cancel Property Insurance';
+    pBtn.className = 'btn-danger w-full text-white font-semibold py-2 rounded-lg cursor-pointer text-sm';
+    pStatus.textContent = '✓ Covered';
+    pStatus.className = 'font-semibold text-green-400';
+  } else {
+    pBtn.textContent = 'Buy Property Insurance ($200/mo)';
+    pBtn.className = 'btn-primary w-full text-white font-semibold py-2 rounded-lg cursor-pointer text-sm';
+    pStatus.textContent = '✗ Not Covered';
+    pStatus.className = 'font-semibold text-red-400';
+  }
+  
+  // Side hustles
+  const sh = gs.sideHustles;
+  document.getElementById('freelanceStatus').textContent = sh.freelance ? 'Active (+$500/mo)' : 'Inactive';
+  document.getElementById('freelanceStatus').className = sh.freelance ? 'text-green-400 font-semibold text-xs' : 'text-red-400 font-semibold text-xs';
+  document.getElementById('freelanceBtn').textContent = sh.freelance ? 'Stop Freelancing' : 'Start Freelancing';
+  document.getElementById('freelanceBtn').className = sh.freelance ? 'btn-danger w-full text-white text-xs py-1.5 rounded-lg cursor-pointer font-semibold' : 'btn-primary w-full text-white text-xs py-1.5 rounded-lg cursor-pointer font-semibold';
+  
+  document.getElementById('contentStatus').textContent = sh.content ? `Active (${sh.contentMonths} months)` : 'Inactive';
+  document.getElementById('contentStatus').className = sh.content ? 'text-green-400 font-semibold text-xs' : 'text-red-400 font-semibold text-xs';
+  document.getElementById('contentBtn').textContent = sh.content ? 'Stop Content Creation' : 'Start Content Creation';
+  document.getElementById('contentBtn').className = sh.content ? 'btn-danger w-full text-white text-xs py-1.5 rounded-lg cursor-pointer font-semibold' : 'btn-primary w-full text-white text-xs py-1.5 rounded-lg cursor-pointer font-semibold';
+  
+  document.getElementById('bizStatus').textContent = sh.business ? 'Active (+~$800/mo)' : 'Inactive';
+  document.getElementById('bizStatus').className = sh.business ? 'text-green-400 font-semibold text-xs' : 'text-red-400 font-semibold text-xs';
+  document.getElementById('bizBtn').textContent = sh.business ? 'Close Business' : 'Start Business ($2,000)';
+  document.getElementById('bizBtn').className = sh.business ? 'btn-danger w-full text-white text-xs py-1.5 rounded-lg cursor-pointer font-semibold' : 'btn-primary w-full text-white text-xs py-1.5 rounded-lg cursor-pointer font-semibold';
+  
+  // Career progression
+  const careerDiv = document.getElementById('careerProgress');
+  careerDiv.innerHTML = CAREER_LEVELS.map((lv, idx) => {
+    const isCurrentOrBelow = idx <= gs.careerIndex;
+    const isEligible = nw >= lv.netWorthReq && gs.creditScore >= lv.creditReq && idx > gs.careerIndex;
+    const nwMet = nw >= lv.netWorthReq;
+    const crMet = gs.creditScore >= lv.creditReq;
+    
+    return `<div class="flex items-center justify-between p-2 rounded-lg ${isCurrentOrBelow ? 'bg-blue-900/20 border border-blue-800/30' : 'bg-slate-900/40'} text-xs mb-1">
+      <div class="flex items-center gap-2">
+        <span class="${isCurrentOrBelow ? 'text-blue-400' : 'text-slate-600'}">${idx <= gs.careerIndex ? '✅' : isEligible ? '🔓' : '🔒'}</span>
+        <div>
+          <div class="${isCurrentOrBelow ? 'text-white font-semibold' : 'text-slate-400'}">${lv.title}</div>
+          <div class="text-slate-600">NW: $${fmt(lv.netWorthReq)} · Credit: ${lv.creditReq} <span class="${!nwMet && idx > gs.careerIndex ? 'text-red-500' : 'text-green-500'}">${nwMet ? '✓' : '✗'}</span> <span class="${!crMet && idx > gs.careerIndex ? 'text-red-500' : 'text-green-500'}">${crMet ? '✓' : '✗'}</span></div>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="${isCurrentOrBelow ? 'neon-green' : 'text-slate-500'}">$${fmt(lv.salary)}/mo</div>
+        ${isEligible && idx > gs.careerIndex ? `<button onclick="applyForPromotion(${idx})" class="btn-success text-white px-2 py-0.5 rounded text-xs cursor-pointer mt-0.5">Promote!</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+
+function switchTab(tab) {
+  ['markets','realestate','career'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.remove('active');
+    document.getElementById(`content-${t}`).classList.remove('active');
+  });
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.getElementById(`content-${tab}`).classList.add('active');
+}
+
+function addLog(msg, type = 'info') {
+  const logEl = document.getElementById('eventLog');
+  const div = document.createElement('div');
+  div.className = `log-entry log-${type} toast-item`;
+  const time = `${MONTHS[gameState.month]} ${gameState.year}`;
+  div.innerHTML = `<span class="text-slate-600 mr-1">[${time}]</span>${msg}`;
+  logEl.insertBefore(div, logEl.firstChild);
+  // Keep log manageable
+  while(logEl.children.length > 50) logEl.removeChild(logEl.lastChild);
+}
+
+function clearLog() {
+  document.getElementById('eventLog').innerHTML = '';
+}
+
+function showGameModal(type, nw) {
+  const modal = document.getElementById('gameModal');
+  const icon = document.getElementById('modalIcon');
+  const title = document.getElementById('modalTitle');
+  const sub = document.getElementById('modalSubtitle');
+  const stats = document.getElementById('modalStats');
+  
+  const turns = gameState.turn;
+  const age = gameState.age;
+  
+  if(type === 'win') {
+    icon.textContent = '🏆';
+    title.textContent = 'Financial Independence Achieved!';
+    sub.textContent = `You reached $2,000,000 net worth at age ${age}!`;
+    title.className = 'text-2xl font-bold mb-2 neon-yellow';
+  } else if(type === 'passive_win') {
+    icon.textContent = '🎯';
+    title.textContent = 'Passive Income Freedom!';
+    sub.textContent = `Your passive income exceeds your expenses at age ${age}!`;
+    title.className = 'text-2xl font-bold mb-2 neon-green';
+  } else if(type === 'bankruptcy') {
+    icon.textContent = '💸';
+    title.textContent = 'Bankruptcy!';
+    sub.textContent = `You ran out of cash at age ${age}. The market crushed you.`;
+    title.className = 'text-2xl font-bold mb-2 neon-red';
+  } else {
+    icon.textContent = '🌅';
+    title.textContent = 'Retirement Age Reached';
+    const outcome = nw >= 2000000 ? '🏆 Millionaire Retiree!' : nw >= 500000 ? '👍 Comfortable Retirement' : nw >= 0 ? '😐 Modest Retirement' : '😞 Struggling in Retirement';
+    sub.textContent = outcome;
+    title.className = 'text-2xl font-bold mb-2 text-white';
+  }
+  
+  stats.textContent = `Net Worth: ${fmtC(nw)} | Turns: ${turns} | Age: ${age}`;
+  modal.style.display = 'flex';
+}
+
+function restartGame() {
+  document.getElementById('gameModal').style.display = 'none';
+  document.getElementById('eventModal').style.display = 'none';
+  document.getElementById('eventLog').innerHTML = '';
+  initGame();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+initGame();
+</script>
 </body>
 </html>
